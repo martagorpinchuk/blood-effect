@@ -1,7 +1,7 @@
 {
   "scripts": {
     "build": "webpack",
-    "dev": "webpack --watch & http-server ./dist --port 8000 -s"
+    "dev": "webpack --watch & http-server ./dist --port 8007 -s"
   },
   "dependencies": {
     "express": "^4.17.3",
@@ -37,18 +37,18 @@
     "webpack-dev-server": "^4.8.1",
     "webpack-merge": "^5.7.3"
   },
-  "name": "live-city",
+  "name": "blood",
   "description": "## Setup Download [Node.js](https://nodejs.org/en/download/). Run this followed commands:",
   "version": "1.0.0",
   "main": "webpack.config.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/martagorpinchuk/live-city.git"
+    "url": "git+https://github.com/martagorpinchuk/blood.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/martagorpinchuk/live-city/issues"
+    "url": "https://github.com/martagorpinchuk/blood/issues"
   },
-  "homepage": "https://github.com/martagorpinchuk/live-city#readme"
+  "homepage": "https://github.com/martagorpinchuk/blood#readme"
 }
