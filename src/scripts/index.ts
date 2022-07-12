@@ -1,9 +1,11 @@
-import { AmbientLight, Clock, Color, Mesh, MeshBasicMaterial, PerspectiveCamera, PlaneBufferGeometry, PointLight, Scene, WebGLRenderer } from "three";
+import { AmbientLight, BoxBufferGeometry, Clock, Color, Mesh, MeshBasicMaterial, PerspectiveCamera, PlaneBufferGeometry, PointLight, Scene, WebGLRenderer } from "three";
 import { MapControls, OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { BloodGfx } from './Blood';
+import { BloodSplatterMaterial } from './shaders/BloodSplatter.Shader';
 
 //
 
-class BloodGfx {
+class Main {
 
     public camera: PerspectiveCamera;
     public plane: Mesh;
@@ -14,6 +16,10 @@ class BloodGfx {
     public delta: number;
     public elapsedTime: number = 0;
     public clock: Clock;
+    public material: BloodSplatterMaterial;
+    public bloodSplatter: Mesh;
+
+    public bloodGfx: BloodGfx;
 
     private sizes = {
         width: 0,
@@ -45,11 +51,6 @@ class BloodGfx {
         this.camera.position.set( 1, 1, 1 );
         this.scene.add( this.camera );
 
-        // Light
-        // const light = new PointLight( 0xffffff, 3, 10 );
-        // light.position.set( 3, 7, 3 );
-        // this.scene.add( light );
-
         const ambientLight = new AmbientLight( 0xffffff, 0.4 );
         this.scene.add( ambientLight );
 
@@ -70,6 +71,18 @@ class BloodGfx {
         this.plane.rotation.z -= Math.PI / 4;
         this.scene.add( this.plane );
 
+        //
+        const light = new PointLight( 0xe9f7ec, 1, 500 );
+        light.position.set( 2, 2, 2 );
+        this.scene.add( light );
+
+        // Cube
+        let cubeGeom = new BoxBufferGeometry( 0.15, 0.15, 0.15 );
+        let cubeMaterial = new MeshBasicMaterial( { color: '#6c6d73' } );
+        let cube = new Mesh( cubeGeom, cubeMaterial );
+        cube.position.y += 0.07;
+        this.scene.add( cube );
+
         // Resize
         window.addEventListener( 'resize', this.resize() );
 
@@ -77,7 +90,27 @@ class BloodGfx {
 
         //
 
+        // this.addBlood();
+
+        let geometry = new PlaneBufferGeometry( 0.51, 0.51 );
+        this.material = new BloodSplatterMaterial();
+        this.bloodSplatter = new Mesh( geometry, this.material );
+
+        this.scene.add( this.bloodSplatter );
+
         this.tick();
+
+    };
+
+    public addBlood () : void {
+
+        // this.bloodGfx = new BloodGfx();
+
+        let geometry = new PlaneBufferGeometry( 0.51, 0.51 );
+        let material = new BloodSplatterMaterial();
+        let bloodSplatter = new Mesh( geometry, material );
+
+        this.scene.add( bloodSplatter );
 
     };
 
@@ -107,6 +140,8 @@ class BloodGfx {
 
         }
 
+        if ( this.bloodSplatter ) this.material.uniforms.uTime.value = this.elapsedTime;
+
         this.controls.update();
         this.renderer.render( this.scene, this.camera );
 
@@ -114,4 +149,4 @@ class BloodGfx {
 
 }
 
-export default new BloodGfx();
+export default new Main();

@@ -12,8 +12,9 @@
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const three_1 = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
 const OrbitControls_js_1 = __webpack_require__(/*! three/examples/jsm/controls/OrbitControls.js */ "./node_modules/three/examples/jsm/controls/OrbitControls.js");
+const BloodSplatter_Shader_1 = __webpack_require__(/*! ./shaders/BloodSplatter.Shader */ "./src/scripts/shaders/BloodSplatter.Shader.ts");
 //
-class BloodGfx {
+class Main {
     constructor() {
         this.elapsedTime = 0;
         this.sizes = {
@@ -27,6 +28,8 @@ class BloodGfx {
             if (this.sizes.width !== window.innerWidth || this.sizes.height !== window.innerHeight) {
                 this.resize();
             }
+            if (this.bloodSplatter)
+                this.material.uniforms.uTime.value = this.elapsedTime;
             this.controls.update();
             this.renderer.render(this.scene, this.camera);
         };
@@ -47,10 +50,6 @@ class BloodGfx {
         this.camera = new three_1.PerspectiveCamera(45, this.sizes.width / this.sizes.height, 0.1, 100);
         this.camera.position.set(1, 1, 1);
         this.scene.add(this.camera);
-        // Light
-        // const light = new PointLight( 0xffffff, 3, 10 );
-        // light.position.set( 3, 7, 3 );
-        // this.scene.add( light );
         const ambientLight = new three_1.AmbientLight(0xffffff, 0.4);
         this.scene.add(ambientLight);
         // Controls
@@ -67,11 +66,34 @@ class BloodGfx {
         this.plane.rotation.x -= Math.PI / 2;
         this.plane.rotation.z -= Math.PI / 4;
         this.scene.add(this.plane);
+        //
+        const light = new three_1.PointLight(0xe9f7ec, 1, 500);
+        light.position.set(2, 2, 2);
+        this.scene.add(light);
+        // Cube
+        let cubeGeom = new three_1.BoxBufferGeometry(0.15, 0.15, 0.15);
+        let cubeMaterial = new three_1.MeshBasicMaterial({ color: '#6c6d73' });
+        let cube = new three_1.Mesh(cubeGeom, cubeMaterial);
+        cube.position.y += 0.07;
+        this.scene.add(cube);
         // Resize
         window.addEventListener('resize', this.resize());
         this.clock = new three_1.Clock();
         //
+        // this.addBlood();
+        let geometry = new three_1.PlaneBufferGeometry(0.51, 0.51);
+        this.material = new BloodSplatter_Shader_1.BloodSplatterMaterial();
+        this.bloodSplatter = new three_1.Mesh(geometry, this.material);
+        this.scene.add(this.bloodSplatter);
         this.tick();
+    }
+    ;
+    addBlood() {
+        // this.bloodGfx = new BloodGfx();
+        let geometry = new three_1.PlaneBufferGeometry(0.51, 0.51);
+        let material = new BloodSplatter_Shader_1.BloodSplatterMaterial();
+        let bloodSplatter = new three_1.Mesh(geometry, material);
+        this.scene.add(bloodSplatter);
     }
     ;
     resize() {
@@ -84,7 +106,64 @@ class BloodGfx {
     }
     ;
 }
-exports["default"] = new BloodGfx();
+exports["default"] = new Main();
+
+
+/***/ }),
+
+/***/ "./src/scripts/shaders/BloodSplatter.Shader.ts":
+/*!*****************************************************!*\
+  !*** ./src/scripts/shaders/BloodSplatter.Shader.ts ***!
+  \*****************************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.BloodSplatterMaterial = void 0;
+const three_3 = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+//
+let loader = new three_3.TextureLoader();
+let noise = loader.load('resources/textures/noise.png');
+class BloodSplatterMaterial extends three_3.ShaderMaterial {
+    constructor() {
+        super();
+        this.transparent = true,
+            this.vertexShader = `
+        varying vec2 vUv;
+
+        void main () {
+
+            gl_Position = vec4( position, 1.0 );
+
+            vUv = uv;
+
+        }`,
+            this.fragmentShader = `
+        uniform sampler2D uNoise;
+        uniform float uTime;
+
+        varying vec2 vUv;
+
+        void main () {
+
+            vec2 centeredUv = vec2( vUv - 0.5 );
+            float distanceToCenter = length( centeredUv );
+
+            float noise = texture2D( uNoise, vUv ).r;
+
+            if ( distanceToCenter > noise + uTime * 0.1 ) { discard; };
+
+            gl_FragColor = vec4( 0.1, 0.0, 0.1, 1.0 );
+
+        }`,
+            this.uniforms = {
+                uNoise: { value: noise },
+                uTime: { value: 0.0 }
+            };
+    }
+}
+exports.BloodSplatterMaterial = BloodSplatterMaterial;
+;
 
 
 /***/ })
@@ -227,7 +306,7 @@ exports["default"] = new BloodGfx();
 /******/ 			return __webpack_require__.O(result);
 /******/ 		}
 /******/ 		
-/******/ 		var chunkLoadingGlobal = self["webpackChunkblood"] = self["webpackChunkblood"] || [];
+/******/ 		var chunkLoadingGlobal = self["webpackChunklive_city"] = self["webpackChunklive_city"] || [];
 /******/ 		chunkLoadingGlobal.forEach(webpackJsonpCallback.bind(null, 0));
 /******/ 		chunkLoadingGlobal.push = webpackJsonpCallback.bind(null, chunkLoadingGlobal.push.bind(chunkLoadingGlobal));
 /******/ 	})();

@@ -50263,8 +50263,8 @@ if ( typeof window !== 'undefined' ) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "OrbitControls": () => (/* binding */ OrbitControls),
-/* harmony export */   "MapControls": () => (/* binding */ MapControls)
+/* harmony export */   "MapControls": () => (/* binding */ MapControls),
+/* harmony export */   "OrbitControls": () => (/* binding */ OrbitControls)
 /* harmony export */ });
 /* harmony import */ var three__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
 
