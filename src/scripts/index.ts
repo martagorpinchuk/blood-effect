@@ -48,7 +48,7 @@ class Main {
 
         // Camera
         this.camera = new PerspectiveCamera( 45, this.sizes.width / this.sizes.height, 0.1, 100 );
-        this.camera.position.set( 1, 1, 1 );
+        this.camera.position.set( 2.3, 1, 0 );
         this.scene.add( this.camera );
 
         const ambientLight = new AmbientLight( 0xffffff, 0.4 );
@@ -56,7 +56,7 @@ class Main {
 
         // Controls
         this.controls = new MapControls( this.camera, this.canvas );
-        this.controls.enableZoom = false;
+        // this.controls.enableZoom = false;
 
         // Renderer
         this.renderer = new WebGLRenderer({ canvas: this.canvas, antialias: true });
@@ -90,13 +90,7 @@ class Main {
 
         //
 
-        // this.addBlood();
-
-        let geometry = new PlaneBufferGeometry( 0.51, 0.51 );
-        this.material = new BloodSplatterMaterial();
-        this.bloodSplatter = new Mesh( geometry, this.material );
-
-        this.scene.add( this.bloodSplatter );
+        this.addBlood();
 
         this.tick();
 
@@ -104,13 +98,8 @@ class Main {
 
     public addBlood () : void {
 
-        // this.bloodGfx = new BloodGfx();
-
-        let geometry = new PlaneBufferGeometry( 0.51, 0.51 );
-        let material = new BloodSplatterMaterial();
-        let bloodSplatter = new Mesh( geometry, material );
-
-        this.scene.add( bloodSplatter );
+        this.bloodGfx = new BloodGfx();
+        this.scene.add( this.bloodGfx.wrapper );
 
     };
 
@@ -140,7 +129,7 @@ class Main {
 
         }
 
-        if ( this.bloodSplatter ) this.material.uniforms.uTime.value = this.elapsedTime;
+        if ( this.bloodGfx ) this.bloodGfx.update( this.elapsedTime );
 
         this.controls.update();
         this.renderer.render( this.scene, this.camera );

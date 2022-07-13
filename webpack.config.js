@@ -18,6 +18,11 @@ module.exports = conf = {
         main: './src/scripts/index'
         // main: './src/scripts/server/'
     },
+    // entry: {
+    //     'fog': './src/scripts/Fog.ts',
+    //     'water': './src/scripts/Water.ts',
+    //     'combustion': './src/scripts/Combustion.ts',
+    // },
     watchOptions: {
         ignored: '**/node_modules'
     },

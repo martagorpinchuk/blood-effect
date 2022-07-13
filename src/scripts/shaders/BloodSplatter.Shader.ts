@@ -1,4 +1,4 @@
-import { ShaderMaterial, TextureLoader } from "three";
+import { Color, ShaderMaterial, TextureLoader } from "three";
 
 //
 
@@ -15,9 +15,30 @@ export class BloodSplatterMaterial extends ShaderMaterial {
         this.vertexShader = `
         varying vec2 vUv;
 
+        uniform float uTime;
+        uniform float uBloodTime;
+
+        attribute vec4 transformRow1;
+        attribute vec4 transformRow2;
+        attribute vec4 transformRow3;
+        attribute vec4 transformRow4;
+
         void main () {
 
-            gl_Position = vec4( position, 1.0 );
+            mat4 transforms = mat4(
+                transformRow1,
+                transformRow2,
+                transformRow3,
+                transformRow4
+            );
+
+            vec3 pos = position;
+            pos.y += cos( uBloodTime ) * 0.6;
+            pos.x += sin( uBloodTime ) * 0.6;
+
+            // gl_Position = projectionMatrix * modelViewMatrix * transforms * vec4( pos, 1.0 );
+
+            gl_Position = projectionMatrix * ( modelViewMatrix * transforms * vec4( 0.0, 0.0, 0.0, 1.0 ) + vec4( pos, 1.0 ) );
 
             vUv = uv;
 
@@ -25,25 +46,38 @@ export class BloodSplatterMaterial extends ShaderMaterial {
         this.fragmentShader = `
         uniform sampler2D uNoise;
         uniform float uTime;
+        uniform float uFading;
+        uniform vec3 uColorLight;
+        uniform vec3 uColorDark;
 
         varying vec2 vUv;
 
         void main () {
 
-            vec2 centeredUv = vec2( vUv - 0.5 );
+            vec2 centeredUv = vec2( vec2( vUv.x - 0.5, ( vUv.y - 0.5 ) * 2.2 ) );
             float distanceToCenter = length( centeredUv );
 
-            float noise = texture2D( uNoise, vUv ).r;
+            float noise = texture2D( uNoise, vUv ).r * 0.6;
 
-            if ( distanceToCenter > noise + uTime * 0.1 ) { discard; };
+            if ( distanceToCenter > noise * 0.67 ) { discard; };
 
-            gl_FragColor = vec4( 0.1, 0.0, 0.1, 1.0 );
+            //
+
+            vec3 mixColor = mix( uColorLight, uColorDark, vec3( noise ) * 1.9 );
+            // mixColor = step( vec3(0.3), vec3(1.5) );
+
+            gl_FragColor.rgb = mixColor;
+            gl_FragColor.a = 1.0 - uFading; // * 0.001;
 
         }`,
         this.uniforms = {
 
             uNoise: { value: noise },
-            uTime: { value: 0.0 }
+            uTime: { value: 0.0 },
+            uColorLight: { value: new Color( 0xe32205 ) },
+            uColorDark: { value: new Color( 0xe330802 ) },
+            uBloodTime: { value: 0.1 },
+            uFading: { value: 0.0 }
 
         }
 
