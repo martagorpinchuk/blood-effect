@@ -5,7 +5,7 @@ import { Color, ShaderMaterial, TextureLoader } from "three";
 let loader = new TextureLoader();
 let noise = loader.load( 'resources/textures/noise.png' );
 
-export class BloodSplatterMaterial extends ShaderMaterial {
+export class GroundBloodSplatterMaterial extends ShaderMaterial {
 
     constructor () {
 
@@ -33,8 +33,8 @@ export class BloodSplatterMaterial extends ShaderMaterial {
             );
 
             vec3 pos = position;
-            pos.y += cos( uBloodTime ) * 0.6;
-            pos.x += sin( uBloodTime ) * 0.6;
+            // pos.y += cos( uBloodTime ) * 0.6;
+            // pos.x += sin( uBloodTime ) * 0.6;
 
             gl_Position = projectionMatrix * modelViewMatrix * transforms * vec4( pos, 1.0 );
 
@@ -47,6 +47,7 @@ export class BloodSplatterMaterial extends ShaderMaterial {
         uniform sampler2D uNoise;
         uniform float uTime;
         uniform float uFading;
+        uniform float uVisibility;
         uniform vec3 uColorLight;
         uniform vec3 uColorDark;
 
@@ -54,7 +55,7 @@ export class BloodSplatterMaterial extends ShaderMaterial {
 
         void main () {
 
-            vec2 centeredUv = vec2( vec2( vUv.x - 0.5, ( vUv.y - 0.5 ) * 2.2 ) );
+            vec2 centeredUv = vec2( vec2( vUv.x - 0.5, ( vUv.y - 0.5 ) * 1.2 ) );
             float distanceToCenter = length( centeredUv );
 
             float noise = texture2D( uNoise, vUv ).r * 0.6;
@@ -67,7 +68,7 @@ export class BloodSplatterMaterial extends ShaderMaterial {
             // mixColor = step( vec3(0.3), vec3(1.5) );
 
             gl_FragColor.rgb = mixColor;
-            gl_FragColor.a = 1.0 - uFading; // * 0.001;
+            gl_FragColor.a = ( 1.0 - uFading ) * uVisibility; // * 0.001;
 
         }`,
         this.transparent = true,
@@ -78,7 +79,8 @@ export class BloodSplatterMaterial extends ShaderMaterial {
             uColorLight: { value: new Color( 0xe32205 ) },
             uColorDark: { value: new Color( 0xe330802 ) },
             uBloodTime: { value: 0.1 },
-            uFading: { value: 0.0 }
+            uFading: { value: 0.0 },
+            uVisibility: { value: 0.0 }
 
         }
 

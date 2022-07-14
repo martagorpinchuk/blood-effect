@@ -10,7 +10,7 @@ export class BloodSplatter {
     public bloodSplatter: Mesh;
     public positionX: number = 0;
     public positionY: number = 0;
-    public positionZ: number = 0;
+    public positionZ: number = - 0.29;
     public wrapper: Object3D = new Object3D();
     public clock: Clock;
     public timeOfFall: number;
@@ -18,6 +18,8 @@ export class BloodSplatter {
     public rotationX: number;
     public rotationY: number;
     public rotationZ: number;
+    public bloodDisappear: Boolean = false;
+    public numberOfBloodDrops: number = 10;
 
     constructor () {
 
@@ -31,7 +33,7 @@ export class BloodSplatter {
 
         this.geometry = new PlaneGeometry( 1, 1 );
         this.material = new BloodSplatterMaterial();
-        // this.bloodSplatter = new Mesh( this.geometry, this.material );
+        this.bloodSplatter = new Mesh( this.geometry, this.material );
 
         if ( this.bloodSplatter ) {
 
@@ -48,11 +50,11 @@ export class BloodSplatter {
 
         for ( let i = 0; i < 4; i ++ ) {
 
-            this.rotationX = - Math.PI / 2;
-            this.rotationY = Math.PI / 4; //Math.PI / 9;
-            this.rotationZ = Math.PI / 2;
+            this.rotationX = 0; //Math.PI / 2;
+            this.rotationY = Math.PI / 2; //Math.PI / 9;
+            this.rotationZ = 0; //Math.PI / 2;
 
-            let transformMatrix = new Matrix4().compose( new Vector3( this.positionX, this.positionY, this.positionZ ), new Quaternion().setFromEuler( new Euler( this.rotationX, this.rotationY, this.rotationZ ) ), new Vector3( 0.7, 0.7, 0.7 ) ).toArray();
+            let transformMatrix = new Matrix4().compose( new Vector3( this.positionX, this.positionY, this.positionZ ), new Quaternion().setFromEuler( new Euler( this.rotationX, this.rotationY, this.rotationZ ) ), new Vector3( 0.5, 0.5, 0.5 ) ).toArray();
 
             transformRow1.push( transformMatrix[0], transformMatrix[1], transformMatrix[2], transformMatrix[3] );
             transformRow2.push( transformMatrix[4], transformMatrix[5], transformMatrix[6], transformMatrix[7] );
@@ -66,7 +68,6 @@ export class BloodSplatter {
         this.geometry.setAttribute( 'transformRow3', new Float32BufferAttribute( new Float32Array( transformRow3 ), 4 ) );
         this.geometry.setAttribute( 'transformRow4', new Float32BufferAttribute( new Float32Array( transformRow4 ), 4 ) );
 
-        this.bloodSplatter = new Mesh( this.geometry, this.material );
         this.wrapper.add( this.bloodSplatter );
 
     };
@@ -85,6 +86,17 @@ export class BloodSplatter {
             this.clock.stop();
 
             // this.material.uniforms.uFading.value = 1.0;
+
+            if ( this.bloodSplatter ) {
+
+                this.material.dispose();
+                this.geometry.dispose();
+
+                this.wrapper.remove( this.bloodSplatter );
+
+            }
+
+            this.bloodDisappear = true;
 
         }
 
