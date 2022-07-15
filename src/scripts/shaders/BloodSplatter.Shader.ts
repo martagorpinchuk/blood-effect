@@ -33,8 +33,8 @@ export class BloodSplatterMaterial extends ShaderMaterial {
             );
 
             vec3 pos = position;
-            pos.y += cos( uBloodTime ) * 0.6;
-            pos.x += sin( uBloodTime ) * 0.6;
+            // pos.y += cos( uBloodTime ) * 0.6;
+            // pos.x += sin( uBloodTime ) * 0.6;
 
             gl_Position = projectionMatrix * modelViewMatrix * transforms * vec4( pos, 1.0 );
 

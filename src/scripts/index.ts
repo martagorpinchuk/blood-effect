@@ -48,7 +48,7 @@ class Main {
 
         // Camera
         this.camera = new PerspectiveCamera( 45, this.sizes.width / this.sizes.height, 0.1, 100 );
-        this.camera.position.set( 2.3, 1, 0 );
+        this.camera.position.set( 4.3, 2, 0 );
         this.scene.add( this.camera );
 
         const ambientLight = new AmbientLight( 0xffffff, 0.4 );
@@ -64,7 +64,7 @@ class Main {
         this.renderer.setPixelRatio( Math.min( window.devicePixelRatio, 2 ) );
 
         // Plane
-        let planeGeometry = new PlaneBufferGeometry( 1.5, 1.5, 1, 1 );
+        let planeGeometry = new PlaneBufferGeometry( 3.5, 3.5, 1, 1 );
         let planeMaterial = new MeshBasicMaterial( { color: '#818891' } );
         this.plane = new Mesh( planeGeometry, planeMaterial );
         this.plane.rotation.x -= Math.PI / 2;
@@ -77,7 +77,7 @@ class Main {
         this.scene.add( light );
 
         // Cube
-        let cubeGeom = new BoxBufferGeometry( 0.15, 0.15, 0.15 );
+        let cubeGeom = new BoxBufferGeometry( 0.25, 0.95, 0.25 );
         let cubeMaterial = new MeshBasicMaterial( { color: '#6c6d73' } );
         let cube = new Mesh( cubeGeom, cubeMaterial );
         cube.position.y += 0.07;
