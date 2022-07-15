@@ -22,6 +22,9 @@ export class BloodSplatter {
     public numberOfBloodDrops: number = 5;
     public positions: Array<number> = [];
     public velocity: Array<number> = [];
+    public size: Array<number> = [];
+    public colorCoef: Array<number> = [];
+    public shape: Array<number> = [];
 
     constructor () {
 
@@ -52,7 +55,7 @@ export class BloodSplatter {
 
         for ( let i = 0; i < this.numberOfBloodDrops; i ++ ) {
 
-            this.rotationX = 0; //Math.PI / 2;
+            this.rotationX = 0;//Math.PI / 3;
             this.rotationY = Math.PI / 2; //Math.PI / 9;
             this.rotationZ = 0; //Math.PI / 2;
 
@@ -67,7 +70,10 @@ export class BloodSplatter {
             transformRow3.push( transformMatrix[8], transformMatrix[9], transformMatrix[10], transformMatrix[11] );
             transformRow4.push( transformMatrix[12], transformMatrix[13], transformMatrix[14], transformMatrix[15] );
 
-            this.velocity.push( ( Math.random() ) * 2, ( Math.random() ) * 2, ( Math.random() ) * 2 );
+            this.velocity.push( Math.random() * 2, Math.random() * 2, Math.random() * 2 );
+            this.size.push( Math.random() * 1 );
+            this.colorCoef.push( ( Math.random() + 0.5) * 1.4 );
+            this.shape.push(  Math.random() );
 
         }
 
@@ -103,6 +109,9 @@ export class BloodSplatter {
         this.geometry.setAttribute( 'transformRow3', new InstancedBufferAttribute( new Float32Array( transformRow3 ), 4 ) );
         this.geometry.setAttribute( 'transformRow4', new InstancedBufferAttribute( new Float32Array( transformRow4 ), 4 ) );
         this.geometry.setAttribute( 'velocity', new InstancedBufferAttribute( new Float32Array( this.velocity ), 3 ) );
+        this.geometry.setAttribute( 'size', new InstancedBufferAttribute( new Float32Array( this.size ), 1 ) );
+        this.geometry.setAttribute( 'colorCoef', new InstancedBufferAttribute( new Float32Array( this.colorCoef ), 1 ) );
+        this.geometry.setAttribute( 'shape', new InstancedBufferAttribute( new Float32Array( this.shape ), 1 ) );
 
         this.wrapper.add( this.bloodSplatter );
 
@@ -115,7 +124,7 @@ export class BloodSplatter {
         this.timeOfFall = this.clock.getDelta() * 1000;
         this.elapsedTimeFall += this.timeOfFall;
 
-        this.material.uniforms.uBloodTime.value = Math.abs( Math.sin( this.elapsedTimeFall * 0.002 ) * 1.5 );
+        this.material.uniforms.uBloodTime.value = Math.abs( Math.sin( this.elapsedTimeFall * 0.001 + Math.PI / 8 ) * 1.5 );
 
         if ( this.material.uniforms.uBloodTime.value.toFixed( 1 ) == 1.5 ) {
 
@@ -137,17 +146,26 @@ export class BloodSplatter {
         for ( let i = 0; i < this.numberOfBloodDrops; i ++ ) {
 
             let newPositionX = this.geometry.attributes.transformRow4.getX( i );
-            let newPositionY = 0; //this.geometry.attributes.transformRow4.getY( i );
+            let newPositionY = this.geometry.attributes.transformRow4.getY( i );
             let newPositionZ = this.geometry.attributes.transformRow4.getZ( i );
 
             let velocityX = this.geometry.attributes.velocity.getX( i );
+            let velocityY = this.geometry.attributes.velocity.getY( i );
             let velocityZ = this.geometry.attributes.velocity.getZ( i );
 
+            // let rotationX = this.geometry.attributes.transformRow1.getX( i );
+            // let rotationZ = this.geometry.attributes.transformRow1.getX( i );
+
             newPositionX = - Math.abs( Math.sin( this.elapsedTimeFall * 0.001 ) * 1.5 ) * velocityX;
+            newPositionY = - Math.abs( Math.sin( this.elapsedTimeFall * 0.001 ) * 1.5 ) * velocityY;
             newPositionZ = - Math.abs( Math.sin( this.elapsedTimeFall * 0.001 ) * 1.5 ) * velocityZ;
 
+            // rotationX += - Math.abs( Math.sin( this.elapsedTimeFall * 0.001 ) * 1.5 ) * velocityZ;
+
             this.geometry.attributes.transformRow4.setX( i, newPositionX );
+            this.geometry.attributes.transformRow4.setY( i, newPositionY );
             this.geometry.attributes.transformRow4.setZ( i, newPositionZ );
+            // this.geometry.attributes.transformRow1.setX( i, rotationX );
 
             // newPositionX +=
 

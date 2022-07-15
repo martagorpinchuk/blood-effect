@@ -78,6 +78,9 @@ class BloodSplatter {
         this.numberOfBloodDrops = 5;
         this.positions = [];
         this.velocity = [];
+        this.size = [];
+        this.colorCoef = [];
+        this.shape = [];
         this.generate();
         this.clock = new three_3.Clock();
     }
@@ -95,7 +98,7 @@ class BloodSplatter {
         const transformRow3 = [];
         const transformRow4 = [];
         for (let i = 0; i < this.numberOfBloodDrops; i++) {
-            this.rotationX = 0; //Math.PI / 2;
+            this.rotationX = 0; //Math.PI / 3;
             this.rotationY = Math.PI / 2; //Math.PI / 9;
             this.rotationZ = 0; //Math.PI / 2;
             let positionX = 0; //( Math.random() - 0.5 ) * 3;
@@ -106,7 +109,10 @@ class BloodSplatter {
             transformRow2.push(transformMatrix[4], transformMatrix[5], transformMatrix[6], transformMatrix[7]);
             transformRow3.push(transformMatrix[8], transformMatrix[9], transformMatrix[10], transformMatrix[11]);
             transformRow4.push(transformMatrix[12], transformMatrix[13], transformMatrix[14], transformMatrix[15]);
-            this.velocity.push((Math.random()) * 2, (Math.random()) * 2, (Math.random()) * 2);
+            this.velocity.push(Math.random() * 2, Math.random() * 2, Math.random() * 2);
+            this.size.push(Math.random() * 1);
+            this.colorCoef.push((Math.random() + 0.5) * 1.4);
+            this.shape.push(Math.random());
         }
         this.positions = [
             -1.0, -1.0, 0.0,
@@ -131,6 +137,9 @@ class BloodSplatter {
         this.geometry.setAttribute('transformRow3', new three_3.InstancedBufferAttribute(new Float32Array(transformRow3), 4));
         this.geometry.setAttribute('transformRow4', new three_3.InstancedBufferAttribute(new Float32Array(transformRow4), 4));
         this.geometry.setAttribute('velocity', new three_3.InstancedBufferAttribute(new Float32Array(this.velocity), 3));
+        this.geometry.setAttribute('size', new three_3.InstancedBufferAttribute(new Float32Array(this.size), 1));
+        this.geometry.setAttribute('colorCoef', new three_3.InstancedBufferAttribute(new Float32Array(this.colorCoef), 1));
+        this.geometry.setAttribute('shape', new three_3.InstancedBufferAttribute(new Float32Array(this.shape), 1));
         this.wrapper.add(this.bloodSplatter);
     }
     ;
@@ -138,7 +147,7 @@ class BloodSplatter {
         this.material.uniforms.uTime.value = elapsedTime;
         this.timeOfFall = this.clock.getDelta() * 1000;
         this.elapsedTimeFall += this.timeOfFall;
-        this.material.uniforms.uBloodTime.value = Math.abs(Math.sin(this.elapsedTimeFall * 0.002) * 1.5);
+        this.material.uniforms.uBloodTime.value = Math.abs(Math.sin(this.elapsedTimeFall * 0.001 + Math.PI / 8) * 1.5);
         if (this.material.uniforms.uBloodTime.value.toFixed(1) == 1.5) {
             this.clock.stop();
             if (this.bloodSplatter) {
@@ -150,14 +159,21 @@ class BloodSplatter {
         }
         for (let i = 0; i < this.numberOfBloodDrops; i++) {
             let newPositionX = this.geometry.attributes.transformRow4.getX(i);
-            let newPositionY = 0; //this.geometry.attributes.transformRow4.getY( i );
+            let newPositionY = this.geometry.attributes.transformRow4.getY(i);
             let newPositionZ = this.geometry.attributes.transformRow4.getZ(i);
             let velocityX = this.geometry.attributes.velocity.getX(i);
+            let velocityY = this.geometry.attributes.velocity.getY(i);
             let velocityZ = this.geometry.attributes.velocity.getZ(i);
+            // let rotationX = this.geometry.attributes.transformRow1.getX( i );
+            // let rotationZ = this.geometry.attributes.transformRow1.getX( i );
             newPositionX = -Math.abs(Math.sin(this.elapsedTimeFall * 0.001) * 1.5) * velocityX;
+            newPositionY = -Math.abs(Math.sin(this.elapsedTimeFall * 0.001) * 1.5) * velocityY;
             newPositionZ = -Math.abs(Math.sin(this.elapsedTimeFall * 0.001) * 1.5) * velocityZ;
+            // rotationX += - Math.abs( Math.sin( this.elapsedTimeFall * 0.001 ) * 1.5 ) * velocityZ;
             this.geometry.attributes.transformRow4.setX(i, newPositionX);
+            this.geometry.attributes.transformRow4.setY(i, newPositionY);
             this.geometry.attributes.transformRow4.setZ(i, newPositionZ);
+            // this.geometry.attributes.transformRow1.setX( i, rotationX );
             // newPositionX +=
         }
         this.geometry.attributes.transformRow4.needsUpdate = true;
@@ -187,6 +203,10 @@ class GroundBloodSplatter {
         this.wrapper = new three_4.Object3D();
         this.numberOfBloodDrops = 5;
         this.positions = [];
+        this.size = [];
+        this.colorCoef = [];
+        this.shape = [];
+        this.noiseFade = [];
         this.generate();
     }
     ;
@@ -202,7 +222,7 @@ class GroundBloodSplatter {
             let rotationX = -Math.PI / 2;
             let rotationY = 0; //Math.PI / 2;
             let rotationZ = 0; //Math.PI / 2;
-            let positionX = (Math.random() - 1) * 2;
+            let positionX = (Math.random()) * 2;
             let positionY = 0.01;
             let positionZ = (Math.random() - 1) * 2;
             let transformMatrix = new three_4.Matrix4().compose(new three_4.Vector3(positionX, positionY, positionZ), new three_4.Quaternion().setFromEuler(new three_4.Euler(rotationX, rotationY, rotationZ)), new three_4.Vector3(0.4, 0.4, 0.4)).toArray();
@@ -210,6 +230,9 @@ class GroundBloodSplatter {
             transformRow2.push(transformMatrix[4], transformMatrix[5], transformMatrix[6], transformMatrix[7]);
             transformRow3.push(transformMatrix[8], transformMatrix[9], transformMatrix[10], transformMatrix[11]);
             transformRow4.push(transformMatrix[12], transformMatrix[13], transformMatrix[14], transformMatrix[15]);
+            this.size.push(Math.random() * 2);
+            this.colorCoef.push((Math.random() + 0.5) * 1.4);
+            this.shape.push(Math.random());
         }
         this.positions = [
             -1.0, -1.0, 0.0,
@@ -233,6 +256,9 @@ class GroundBloodSplatter {
         this.geometry.setAttribute('transformRow2', new three_4.InstancedBufferAttribute(new Float32Array(transformRow2), 4));
         this.geometry.setAttribute('transformRow3', new three_4.InstancedBufferAttribute(new Float32Array(transformRow3), 4));
         this.geometry.setAttribute('transformRow4', new three_4.InstancedBufferAttribute(new Float32Array(transformRow4), 4));
+        this.geometry.setAttribute('size', new three_4.InstancedBufferAttribute(new Float32Array(this.size), 1));
+        this.geometry.setAttribute('colorCoef', new three_4.InstancedBufferAttribute(new Float32Array(this.colorCoef), 1));
+        this.geometry.setAttribute('shape', new three_4.InstancedBufferAttribute(new Float32Array(this.shape), 1));
         this.wrapper.add(this.groundBloodSplatter);
     }
     ;
@@ -293,7 +319,7 @@ class Main {
             this.sizes.height = window.innerHeight;
         // Camera
         this.camera = new three_1.PerspectiveCamera(45, this.sizes.width / this.sizes.height, 0.1, 100);
-        this.camera.position.set(4.3, 2, 0);
+        this.camera.position.set(5.3, 3, 0);
         this.scene.add(this.camera);
         const ambientLight = new three_1.AmbientLight(0xffffff, 0.4);
         this.scene.add(ambientLight);
@@ -305,7 +331,7 @@ class Main {
         this.renderer.setSize(this.sizes.width, this.sizes.height);
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         // Plane
-        let planeGeometry = new three_1.PlaneBufferGeometry(3.5, 3.5, 1, 1);
+        let planeGeometry = new three_1.PlaneBufferGeometry(6.5, 6.5, 1, 1);
         let planeMaterial = new three_1.MeshBasicMaterial({ color: '#818891' });
         this.plane = new three_1.Mesh(planeGeometry, planeMaterial);
         this.plane.rotation.x -= Math.PI / 2;
@@ -368,6 +394,8 @@ class BloodSplatterMaterial extends three_5.ShaderMaterial {
         this.transparent = true,
             this.vertexShader = `
         varying vec2 vUv;
+        varying float vColorCoef;
+        varying float vShape;
 
         uniform float uTime;
         uniform float uBloodTime;
@@ -376,6 +404,9 @@ class BloodSplatterMaterial extends three_5.ShaderMaterial {
         attribute vec4 transformRow2;
         attribute vec4 transformRow3;
         attribute vec4 transformRow4;
+        attribute float size;
+        attribute float colorCoef;
+        attribute float shape;
 
         void main () {
 
@@ -390,11 +421,15 @@ class BloodSplatterMaterial extends three_5.ShaderMaterial {
             // pos.y += cos( uBloodTime ) * 0.6;
             // pos.x += sin( uBloodTime ) * 0.6;
 
-            gl_Position = projectionMatrix * modelViewMatrix * transforms * vec4( pos, 1.0 );
+            // gl_Position = projectionMatrix * modelViewMatrix * transforms + vec4( position * size, 1.0 );
+
+            gl_Position = projectionMatrix * ( modelViewMatrix * transforms * vec4( 0.0, 0.0, 0.0, 1.0 ) + vec4( position * size, 1.0 ) );
 
             // gl_Position = projectionMatrix * ( modelViewMatrix * transforms * vec4( 0.0, 0.0, 0.0, 1.0 ) + vec4( pos, 1.0 ) );
 
             vUv = uv;
+            vColorCoef = colorCoef;
+            vShape = shape;
 
         }`,
             this.fragmentShader = `
@@ -405,6 +440,8 @@ class BloodSplatterMaterial extends three_5.ShaderMaterial {
         uniform vec3 uColorDark;
 
         varying vec2 vUv;
+        varying float vColorCoef;
+        varying float vShape;
 
         void main () {
 
@@ -413,11 +450,11 @@ class BloodSplatterMaterial extends three_5.ShaderMaterial {
 
             float noise = texture2D( uNoise, vUv ).r * 0.6;
 
-            if ( distanceToCenter > noise * 0.67 ) { discard; };
+            if ( distanceToCenter > noise * vShape ) { discard; };
 
             //
 
-            vec3 mixColor = mix( uColorLight, uColorDark, vec3( noise ) * 1.9 );
+            vec3 mixColor = mix( uColorLight, uColorDark, vec3( noise ) * vColorCoef * 1.0 );
             // mixColor = step( vec3(0.3), vec3(1.5) );
 
             gl_FragColor.rgb = mixColor;
@@ -460,6 +497,8 @@ class GroundBloodSplatterMaterial extends three_6.ShaderMaterial {
         this.transparent = true,
             this.vertexShader = `
         varying vec2 vUv;
+        varying float vColorCoef;
+        varying float vShape;
 
         uniform float uTime;
         uniform float uBloodTime;
@@ -468,6 +507,9 @@ class GroundBloodSplatterMaterial extends three_6.ShaderMaterial {
         attribute vec4 transformRow2;
         attribute vec4 transformRow3;
         attribute vec4 transformRow4;
+        attribute float size;
+        attribute float colorCoef;
+        attribute float shape;
 
         void main () {
 
@@ -482,11 +524,13 @@ class GroundBloodSplatterMaterial extends three_6.ShaderMaterial {
             // pos.y += cos( uBloodTime ) * 0.6;
             // pos.x += sin( uBloodTime ) * 0.6;
 
-            gl_Position = projectionMatrix * modelViewMatrix * transforms * vec4( pos, 1.0 );
+            gl_Position = projectionMatrix * modelViewMatrix * transforms * vec4( pos * size, 1.0 );
 
-            // gl_Position = projectionMatrix * ( modelViewMatrix * transforms * vec4( 0.0, 0.0, 0.0, 1.0 ) + vec4( pos, 1.0 ) );
+            // gl_Position = projectionMatrix * ( modelViewMatrix * transforms * vec4( 0.0, 0.0, 0.0, 1.0 ) + vec4( pos * size, 1.0 ) );
 
             vUv = uv;
+            vColorCoef = colorCoef;
+            vShape = shape;
 
         }`,
             this.fragmentShader = `
@@ -498,6 +542,8 @@ class GroundBloodSplatterMaterial extends three_6.ShaderMaterial {
         uniform vec3 uColorDark;
 
         varying vec2 vUv;
+        varying float vColorCoef;
+        varying float vShape;
 
         void main () {
 
@@ -506,15 +552,15 @@ class GroundBloodSplatterMaterial extends three_6.ShaderMaterial {
 
             float noise = texture2D( uNoise, vUv ).r * 0.6;
 
-            if ( distanceToCenter > noise * 0.67 ) { discard; };
+            if ( distanceToCenter > noise * vShape ) { discard; };
 
             //
 
-            vec3 mixColor = mix( uColorLight, uColorDark, vec3( noise ) * 1.9 );
+            vec3 mixColor = mix( uColorLight, uColorDark, vec3( noise ) * vColorCoef * 1.0 );
             // mixColor = step( vec3(0.3), vec3(1.5) );
 
             gl_FragColor.rgb = mixColor;
-            gl_FragColor.a = ( 1.0 - uFading ) * uVisibility; // * 0.001;
+            gl_FragColor.a = ( 1.0 - uFading * noise * 2.3 ) * uVisibility; // * 0.001;
 
         }`,
             this.transparent = true,

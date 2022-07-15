@@ -12,6 +12,10 @@ export class GroundBloodSplatter {
     public groundBloodSplatter: Mesh;
     public numberOfBloodDrops: number = 5;
     public positions: Array<number> = [];
+    public size: Array<number> = [];
+    public colorCoef: Array<number> = [];
+    public shape: Array<number> = [];
+    public noiseFade: Array<number> = [];
 
     constructor () {
 
@@ -37,7 +41,7 @@ export class GroundBloodSplatter {
             let rotationY = 0;//Math.PI / 2;
             let rotationZ = 0;//Math.PI / 2;
 
-            let positionX = ( Math.random() - 1 ) * 2;
+            let positionX = ( Math.random() ) * 2;
             let positionY = 0.01;
             let positionZ = ( Math.random() - 1 ) * 2;
 
@@ -47,6 +51,10 @@ export class GroundBloodSplatter {
             transformRow2.push( transformMatrix[4], transformMatrix[5], transformMatrix[6], transformMatrix[7] );
             transformRow3.push( transformMatrix[8], transformMatrix[9], transformMatrix[10], transformMatrix[11] );
             transformRow4.push( transformMatrix[12], transformMatrix[13], transformMatrix[14], transformMatrix[15] );
+
+            this.size.push( Math.random() * 2 );
+            this.colorCoef.push( ( Math.random() + 0.5 ) * 1.4 );
+            this.shape.push( Math.random() );
 
         }
 
@@ -81,6 +89,9 @@ export class GroundBloodSplatter {
         this.geometry.setAttribute( 'transformRow2', new InstancedBufferAttribute( new Float32Array( transformRow2 ), 4 ) );
         this.geometry.setAttribute( 'transformRow3', new InstancedBufferAttribute( new Float32Array( transformRow3 ), 4 ) );
         this.geometry.setAttribute( 'transformRow4', new InstancedBufferAttribute( new Float32Array( transformRow4 ), 4 ) );
+        this.geometry.setAttribute( 'size', new InstancedBufferAttribute( new Float32Array( this.size ), 1 ) );
+        this.geometry.setAttribute( 'colorCoef', new InstancedBufferAttribute( new Float32Array( this.colorCoef ), 1 ) );
+        this.geometry.setAttribute( 'shape', new InstancedBufferAttribute( new Float32Array( this.shape ), 1 ) );
 
         this.wrapper.add( this.groundBloodSplatter );
 

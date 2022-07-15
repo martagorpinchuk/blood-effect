@@ -48,7 +48,7 @@ class Main {
 
         // Camera
         this.camera = new PerspectiveCamera( 45, this.sizes.width / this.sizes.height, 0.1, 100 );
-        this.camera.position.set( 4.3, 2, 0 );
+        this.camera.position.set( 5.3, 3, 0 );
         this.scene.add( this.camera );
 
         const ambientLight = new AmbientLight( 0xffffff, 0.4 );
@@ -64,7 +64,7 @@ class Main {
         this.renderer.setPixelRatio( Math.min( window.devicePixelRatio, 2 ) );
 
         // Plane
-        let planeGeometry = new PlaneBufferGeometry( 3.5, 3.5, 1, 1 );
+        let planeGeometry = new PlaneBufferGeometry( 6.5, 6.5, 1, 1 );
         let planeMaterial = new MeshBasicMaterial( { color: '#818891' } );
         this.plane = new Mesh( planeGeometry, planeMaterial );
         this.plane.rotation.x -= Math.PI / 2;

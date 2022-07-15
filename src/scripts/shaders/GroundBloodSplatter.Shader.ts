@@ -14,6 +14,8 @@ export class GroundBloodSplatterMaterial extends ShaderMaterial {
         this.transparent = true,
         this.vertexShader = `
         varying vec2 vUv;
+        varying float vColorCoef;
+        varying float vShape;
 
         uniform float uTime;
         uniform float uBloodTime;
@@ -22,6 +24,9 @@ export class GroundBloodSplatterMaterial extends ShaderMaterial {
         attribute vec4 transformRow2;
         attribute vec4 transformRow3;
         attribute vec4 transformRow4;
+        attribute float size;
+        attribute float colorCoef;
+        attribute float shape;
 
         void main () {
 
@@ -36,11 +41,13 @@ export class GroundBloodSplatterMaterial extends ShaderMaterial {
             // pos.y += cos( uBloodTime ) * 0.6;
             // pos.x += sin( uBloodTime ) * 0.6;
 
-            gl_Position = projectionMatrix * modelViewMatrix * transforms * vec4( pos, 1.0 );
+            gl_Position = projectionMatrix * modelViewMatrix * transforms * vec4( pos * size, 1.0 );
 
-            // gl_Position = projectionMatrix * ( modelViewMatrix * transforms * vec4( 0.0, 0.0, 0.0, 1.0 ) + vec4( pos, 1.0 ) );
+            // gl_Position = projectionMatrix * ( modelViewMatrix * transforms * vec4( 0.0, 0.0, 0.0, 1.0 ) + vec4( pos * size, 1.0 ) );
 
             vUv = uv;
+            vColorCoef = colorCoef;
+            vShape = shape;
 
         }`,
         this.fragmentShader = `
@@ -52,6 +59,8 @@ export class GroundBloodSplatterMaterial extends ShaderMaterial {
         uniform vec3 uColorDark;
 
         varying vec2 vUv;
+        varying float vColorCoef;
+        varying float vShape;
 
         void main () {
 
@@ -60,15 +69,15 @@ export class GroundBloodSplatterMaterial extends ShaderMaterial {
 
             float noise = texture2D( uNoise, vUv ).r * 0.6;
 
-            if ( distanceToCenter > noise * 0.67 ) { discard; };
+            if ( distanceToCenter > noise * vShape ) { discard; };
 
             //
 
-            vec3 mixColor = mix( uColorLight, uColorDark, vec3( noise ) * 1.9 );
+            vec3 mixColor = mix( uColorLight, uColorDark, vec3( noise ) * vColorCoef * 1.0 );
             // mixColor = step( vec3(0.3), vec3(1.5) );
 
             gl_FragColor.rgb = mixColor;
-            gl_FragColor.a = ( 1.0 - uFading ) * uVisibility; // * 0.001;
+            gl_FragColor.a = ( 1.0 - uFading * noise * 2.3 ) * uVisibility; // * 0.001;
 
         }`,
         this.transparent = true,
