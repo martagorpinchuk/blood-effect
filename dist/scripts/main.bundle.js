@@ -18,10 +18,12 @@ const GroundBloodSplatter_1 = __webpack_require__(/*! ./GroundBloodSplatter */ "
 class BloodGfx {
     constructor() {
         this.elapsedTimeBlood = 0;
+        this.fadingCoef = 1;
         this.wrapper = new three_2.Object3D();
         this.clock = new three_2.Clock();
         this.addBloodSplatter();
         this.addGroundBloodSplatter();
+        // this.debug();
         this.wrapper.add(this.bloodSplatter.wrapper);
         this.wrapper.add(this.groundBloodSplatter.wrapper);
     }
@@ -41,7 +43,7 @@ class BloodGfx {
             this.elapsedTimeBlood += this.delta;
             this.groundBloodSplatter.update(elapsedTime, this.bloodSplatter.splashPositionX, this.bloodSplatter.splashPositionZ);
             this.groundBloodSplatter.material.uniforms.uVisibility.value = 1.0;
-            this.groundBloodSplatter.material.uniforms.uFading.value = this.elapsedTimeBlood * 0.001;
+            this.groundBloodSplatter.material.uniforms.uFading.value = this.elapsedTimeBlood * 0.001 * this.fadingCoef;
         }
         ;
         this.groundBloodSplatter.geometry.attributes.transformRow1.needsUpdate = true;
@@ -83,17 +85,22 @@ class BloodSplatter {
         this.bloodOpacity = [];
         this.splashPositionX = [];
         this.splashPositionZ = [];
+        this.timeCoef = 1;
         this.generate();
         this.clock = new three_3.Clock();
     }
     ;
     generate() {
+        if (this.mesh) {
+            this.geometry.dispose();
+            this.wrapper.remove(this.mesh);
+        }
         this.geometry = new three_3.InstancedBufferGeometry();
         this.material = new BloodSplatter_Shader_1.BloodSplatterMaterial();
-        this.bloodSplatter = new three_3.Mesh(this.geometry, this.material);
-        if (this.bloodSplatter) {
+        this.mesh = new three_3.Mesh(this.geometry, this.material);
+        if (this.mesh) {
             this.geometry.dispose();
-            this.wrapper.remove(this.bloodSplatter);
+            this.wrapper.remove(this.mesh);
         }
         const transformRow1 = [];
         const transformRow2 = [];
@@ -144,7 +151,7 @@ class BloodSplatter {
         this.geometry.setAttribute('colorCoef', new three_3.InstancedBufferAttribute(new Float32Array(this.colorCoef), 1));
         this.geometry.setAttribute('shape', new three_3.InstancedBufferAttribute(new Float32Array(this.shape), 1));
         this.geometry.setAttribute('bloodOpacity', new three_3.InstancedBufferAttribute(new Float32Array(this.bloodOpacity), 1));
-        this.wrapper.add(this.bloodSplatter);
+        this.wrapper.add(this.mesh);
     }
     ;
     update(elapsedTime) {
@@ -175,9 +182,9 @@ class BloodSplatter {
                     this.splashPositionZ.push(newPositionZ);
                 }
             }
-            newPositionX += -velocityX * this.elapsedTimeFall * 0.0001; // - Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityX;
-            newPositionY += -velocityY * this.elapsedTimeFall * 0.0001; //- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityY;
-            newPositionZ += -velocityZ * this.elapsedTimeFall * 0.0001; //- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityZ;
+            newPositionX += -velocityX * this.elapsedTimeFall * 0.0001 * this.timeCoef; // - Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityX;
+            newPositionY += -velocityY * this.elapsedTimeFall * 0.0001 * this.timeCoef; //- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityY;
+            newPositionZ += -velocityZ * this.elapsedTimeFall * 0.0001 * this.timeCoef; //- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityZ;
             // cos1X += newPositionX * Math.cos( Math.PI / this.elapsedTimeFall * 1 );//- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityZ;
             // sin1Y += newPositionX * Math.sin( Math.PI / this.elapsedTimeFall * 1 );
             // sin2X += newPositionY * Math.sin( Math.PI / this.elapsedTimeFall * 1 );//- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityZ;
@@ -230,9 +237,13 @@ class GroundBloodSplatter {
     }
     ;
     generate(splashPositionX, splashPositionZ) {
+        if (this.mesh) {
+            this.geometry.dispose();
+            this.wrapper.remove(this.mesh);
+        }
         this.geometry = new three_4.InstancedBufferGeometry();
         this.material = new GroundBloodSplatter_Shader_1.GroundBloodSplatterMaterial();
-        this.groundBloodSplatter = new three_4.Mesh(this.geometry, this.material);
+        this.mesh = new three_4.Mesh(this.geometry, this.material);
         const transformRow1 = [];
         const transformRow2 = [];
         const transformRow3 = [];
@@ -278,7 +289,7 @@ class GroundBloodSplatter {
         this.geometry.setAttribute('size', new three_4.InstancedBufferAttribute(new Float32Array(this.size), 1));
         this.geometry.setAttribute('colorCoef', new three_4.InstancedBufferAttribute(new Float32Array(this.colorCoef), 1));
         this.geometry.setAttribute('shape', new three_4.InstancedBufferAttribute(new Float32Array(this.shape), 1));
-        this.wrapper.add(this.groundBloodSplatter);
+        this.wrapper.add(this.mesh);
     }
     ;
     update(elapsedTime, splashPositionX, splashPositionZ) {
@@ -315,6 +326,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const three_1 = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
 const OrbitControls_js_1 = __webpack_require__(/*! three/examples/jsm/controls/OrbitControls.js */ "./node_modules/three/examples/jsm/controls/OrbitControls.js");
 const Blood_1 = __webpack_require__(/*! ./Blood */ "./src/scripts/Blood.ts");
+const tweakpane_1 = __webpack_require__(/*! tweakpane */ "./node_modules/tweakpane/dist/tweakpane.js");
 //
 class Main {
     constructor() {
@@ -334,6 +346,12 @@ class Main {
                 this.bloodGfx.update(this.elapsedTime);
             this.controls.update();
             this.renderer.render(this.scene, this.camera);
+            if (Math.round(this.elapsedTime) > 4500) {
+                this.createBlood();
+                this.elapsedTime = 0;
+                this.bloodGfx.elapsedTimeBlood = 0;
+                this.bloodGfx.bloodSplatter.elapsedTimeFall = 0;
+            }
         };
         this.init();
         console.log('loaded!');
@@ -382,13 +400,43 @@ class Main {
         window.addEventListener('resize', this.resize());
         this.clock = new three_1.Clock();
         //
-        this.addBlood();
+        this.createBlood();
+        this.debug();
         this.tick();
     }
     ;
-    addBlood() {
+    createBlood() {
+        if (this.bloodGfx) {
+            this.bloodGfx.bloodSplatter.material.dispose();
+            this.bloodGfx.bloodSplatter.geometry.dispose();
+            this.bloodGfx.groundBloodSplatter.material.dispose();
+            this.bloodGfx.groundBloodSplatter.geometry.dispose();
+            this.scene.remove(this.bloodGfx.wrapper);
+        }
         this.bloodGfx = new Blood_1.BloodGfx();
         this.scene.add(this.bloodGfx.wrapper);
+    }
+    ;
+    debug() {
+        const props = {
+            bloodGroundColor: '#ff0000',
+            bloodColor: '#ff0000'
+        };
+        let pane = new tweakpane_1.Pane({ title: "Explosion" }); //  expanded: false
+        pane.element.parentElement.style['width'] = '330px';
+        let color = pane.addFolder({ title: "Blood color" });
+        let bloodSpeed = pane.addFolder({ title: "Speed" });
+        color.addInput(props, 'bloodGroundColor', { label: 'Ground blood color' }).on('change', () => {
+            this.bloodGfx.groundBloodSplatter.material.uniforms.uColorLight.value.setHex(parseInt(props.bloodGroundColor.replace('#', '0x')));
+        });
+        color.addInput(props, 'bloodColor', { label: 'Blood color' }).on('change', () => {
+            this.bloodGfx.groundBloodSplatter.material.uniforms.uColorLight.value.setHex(parseInt(props.bloodColor.replace('#', '0x')));
+        });
+        //
+        bloodSpeed.addInput(this.bloodGfx.bloodSplatter, 'timeCoef', { min: 0.01, max: 2, label: 'Falling blood speed' }).on('change', () => {
+            // th
+        });
+        bloodSpeed.addInput(this.bloodGfx, 'fadingCoef', { min: 0.01, max: 2, label: 'Ground fading speed' });
     }
     ;
     resize() {
@@ -522,11 +570,11 @@ exports.BloodSplatterMaterial = BloodSplatterMaterial;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GroundBloodSplatterMaterial = void 0;
-const three_6 = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+const three_5 = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
 //
-let loader = new three_6.TextureLoader();
+let loader = new three_5.TextureLoader();
 let noise = loader.load('resources/textures/noise.png');
-class GroundBloodSplatterMaterial extends three_6.ShaderMaterial {
+class GroundBloodSplatterMaterial extends three_5.ShaderMaterial {
     constructor() {
         super();
         this.transparent = true,
@@ -602,8 +650,8 @@ class GroundBloodSplatterMaterial extends three_6.ShaderMaterial {
             this.uniforms = {
                 uNoise: { value: noise },
                 uTime: { value: 0.0 },
-                uColorLight: { value: new three_6.Color(0xe32205) },
-                uColorDark: { value: new three_6.Color(0xe330802) },
+                uColorLight: { value: new three_5.Color(0xe32205) },
+                uColorDark: { value: new three_5.Color(0xe330802) },
                 uBloodTime: { value: 0.1 },
                 uFading: { value: 0.0 },
                 uVisibility: { value: 0.0 }
@@ -636,7 +684,7 @@ exports.GroundBloodSplatterMaterial = GroundBloodSplatterMaterial;
 /******/ 		};
 /******/ 	
 /******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
 /******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;

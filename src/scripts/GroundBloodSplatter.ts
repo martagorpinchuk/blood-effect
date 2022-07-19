@@ -9,7 +9,7 @@ export class GroundBloodSplatter {
     public material: GroundBloodSplatterMaterial;
     public geometry: InstancedBufferGeometry;
     public wrapper: Object3D = new Object3D();
-    public groundBloodSplatter: Mesh;
+    public mesh: Mesh;
     public numberOfBloodDrops: number = 9;
     public positions: Array<number> = [];
     public size: Array<number> = [];
@@ -25,10 +25,17 @@ export class GroundBloodSplatter {
 
     public generate ( splashPositionX, splashPositionZ ) : void {
 
+        if ( this.mesh ) {
+
+            this.geometry.dispose();
+
+            this.wrapper.remove( this.mesh );
+
+        }
+
         this.geometry = new InstancedBufferGeometry();
         this.material = new GroundBloodSplatterMaterial();
-
-        this.groundBloodSplatter = new Mesh( this.geometry, this.material );
+        this.mesh = new Mesh( this.geometry, this.material );
 
         const transformRow1: number[] = [];
         const transformRow2: number[] = [];
@@ -93,7 +100,7 @@ export class GroundBloodSplatter {
         this.geometry.setAttribute( 'colorCoef', new InstancedBufferAttribute( new Float32Array( this.colorCoef ), 1 ) );
         this.geometry.setAttribute( 'shape', new InstancedBufferAttribute( new Float32Array( this.shape ), 1 ) );
 
-        this.wrapper.add( this.groundBloodSplatter );
+        this.wrapper.add( this.mesh );
 
     };
 

@@ -2,6 +2,7 @@ import { AmbientLight, BoxBufferGeometry, Clock, Color, Mesh, MeshBasicMaterial,
 import { MapControls, OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { BloodGfx } from './Blood';
 import { BloodSplatterMaterial } from './shaders/BloodSplatter.Shader';
+import { Pane } from "tweakpane";
 
 //
 
@@ -90,16 +91,66 @@ class Main {
 
         //
 
-        this.addBlood();
+        this.createBlood();
+        this.debug();
 
         this.tick();
 
     };
 
-    public addBlood () : void {
+    public createBlood () : void {
+
+        if ( this.bloodGfx ) {
+
+            this.bloodGfx.bloodSplatter.material.dispose();
+            this.bloodGfx.bloodSplatter.geometry.dispose();
+            this.bloodGfx.groundBloodSplatter.material.dispose();
+            this.bloodGfx.groundBloodSplatter.geometry.dispose();
+
+            this.scene.remove( this.bloodGfx.wrapper );
+
+        }
 
         this.bloodGfx = new BloodGfx();
         this.scene.add( this.bloodGfx.wrapper );
+
+    };
+
+    public debug () : void {
+
+        const props = {
+
+            bloodGroundColor: '#ff0000',
+            bloodColor: '#ff0000'
+
+        };
+
+        let pane = new Pane(  { title: "Explosion" } ); //  expanded: false
+        pane.element.parentElement.style['width'] = '330px';
+
+        let color = pane.addFolder( { title: "Blood color" } );
+        let bloodSpeed = pane.addFolder( { title: "Speed" } );
+
+        color.addInput( props, 'bloodGroundColor', { label: 'Ground blood color' } ).on( 'change', () => {
+
+            this.bloodGfx.groundBloodSplatter.material.uniforms.uColorLight.value.setHex( parseInt( props.bloodGroundColor.replace( '#', '0x' ) ) );
+
+        } );
+
+        color.addInput( props, 'bloodColor', { label: 'Blood color' } ).on( 'change', () => {
+
+            this.bloodGfx.groundBloodSplatter.material.uniforms.uColorLight.value.setHex( parseInt( props.bloodColor.replace( '#', '0x' ) ) );
+
+        } );
+
+        //
+
+        bloodSpeed.addInput( this.bloodGfx.bloodSplatter, 'timeCoef', { min: 0.01, max: 2, label: 'Falling blood speed' } ).on( 'change', () => {
+
+            // th
+
+        } );
+        bloodSpeed.addInput( this.bloodGfx, 'fadingCoef', { min: 0.01, max: 2, label: 'Ground fading speed' } );
 
     };
 
@@ -133,6 +184,16 @@ class Main {
 
         this.controls.update();
         this.renderer.render( this.scene, this.camera );
+
+        if ( Math.round( this.elapsedTime ) > 4500 ) {
+
+            this.createBlood();
+
+            this.elapsedTime = 0;
+            this.bloodGfx.elapsedTimeBlood = 0;
+            this.bloodGfx.bloodSplatter.elapsedTimeFall = 0;
+
+        }
 
     };
 

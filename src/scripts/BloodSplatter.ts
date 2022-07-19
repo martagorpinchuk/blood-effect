@@ -7,7 +7,7 @@ export class BloodSplatter {
 
     public material: BloodSplatterMaterial;
     public geometry: InstancedBufferGeometry;
-    public bloodSplatter: Mesh;
+    public mesh: Mesh;
     public wrapper: Object3D = new Object3D();
     public clock: Clock;
     public timeOfFall: number;
@@ -25,6 +25,7 @@ export class BloodSplatter {
     public bloodOpacity: Array<number> = [];
     public splashPositionX: Array<number> = [];
     public splashPositionZ: Array<number> = [];
+    public timeCoef: number = 1;
 
     constructor () {
 
@@ -36,15 +37,23 @@ export class BloodSplatter {
 
     public generate () : void {
 
-        this.geometry = new InstancedBufferGeometry();
-        this.material = new BloodSplatterMaterial();
-        this.bloodSplatter = new Mesh( this.geometry, this.material );
-
-        if ( this.bloodSplatter ) {
+        if ( this.mesh ) {
 
             this.geometry.dispose();
 
-            this.wrapper.remove( this.bloodSplatter );
+            this.wrapper.remove( this.mesh );
+
+        }
+
+        this.geometry = new InstancedBufferGeometry();
+        this.material = new BloodSplatterMaterial();
+        this.mesh = new Mesh( this.geometry, this.material );
+
+        if ( this.mesh ) {
+
+            this.geometry.dispose();
+
+            this.wrapper.remove( this.mesh );
 
         }
 
@@ -115,7 +124,7 @@ export class BloodSplatter {
         this.geometry.setAttribute( 'shape', new InstancedBufferAttribute( new Float32Array( this.shape ), 1 ) );
         this.geometry.setAttribute( 'bloodOpacity', new InstancedBufferAttribute( new Float32Array( this.bloodOpacity ), 1 ) );
 
-        this.wrapper.add( this.bloodSplatter );
+        this.wrapper.add( this.mesh );
 
     };
 
@@ -164,9 +173,9 @@ export class BloodSplatter {
                 }
             }
 
-            newPositionX += - velocityX * this.elapsedTimeFall * 0.0001;// - Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityX;
-            newPositionY += - velocityY * this.elapsedTimeFall * 0.0001;//- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityY;
-            newPositionZ += - velocityZ * this.elapsedTimeFall * 0.0001;//- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityZ;
+            newPositionX += - velocityX * this.elapsedTimeFall * 0.0001 * this.timeCoef;// - Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityX;
+            newPositionY += - velocityY * this.elapsedTimeFall * 0.0001 * this.timeCoef;//- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityY;
+            newPositionZ += - velocityZ * this.elapsedTimeFall * 0.0001 * this.timeCoef;//- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityZ;
 
             // cos1X += newPositionX * Math.cos( Math.PI / this.elapsedTimeFall * 1 );//- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityZ;
             // sin1Y += newPositionX * Math.sin( Math.PI / this.elapsedTimeFall * 1 );
