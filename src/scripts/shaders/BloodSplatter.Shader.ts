@@ -16,6 +16,7 @@ export class BloodSplatterMaterial extends ShaderMaterial {
         varying vec2 vUv;
         varying float vColorCoef;
         varying float vShape;
+        varying float vBloodOpacity;
 
         uniform float uTime;
         uniform float uBloodTime;
@@ -27,6 +28,7 @@ export class BloodSplatterMaterial extends ShaderMaterial {
         attribute float size;
         attribute float colorCoef;
         attribute float shape;
+        attribute float bloodOpacity;
 
         void main () {
 
@@ -41,15 +43,16 @@ export class BloodSplatterMaterial extends ShaderMaterial {
             // pos.y += cos( uBloodTime ) * 0.6;
             // pos.x += sin( uBloodTime ) * 0.6;
 
-            // gl_Position = projectionMatrix * modelViewMatrix * transforms + vec4( position * size, 1.0 );
+            // gl_Position = projectionMatrix * modelViewMatrix * transforms * vec4( position * size, 1.0 );
 
-            gl_Position = projectionMatrix * ( modelViewMatrix * transforms * vec4( 0.0, 0.0, 0.0, 1.0 ) + vec4( position * size, 1.0 ) );
+            gl_Position = projectionMatrix * ( modelViewMatrix * transforms * vec4( 0.0, 0.0, position.z, 1.0 ) + vec4( position * size, 1.0 ) );
 
             // gl_Position = projectionMatrix * ( modelViewMatrix * transforms * vec4( 0.0, 0.0, 0.0, 1.0 ) + vec4( pos, 1.0 ) );
 
             vUv = uv;
             vColorCoef = colorCoef;
             vShape = shape;
+            vBloodOpacity = bloodOpacity;
 
         }`,
         this.fragmentShader = `
@@ -62,6 +65,7 @@ export class BloodSplatterMaterial extends ShaderMaterial {
         varying vec2 vUv;
         varying float vColorCoef;
         varying float vShape;
+        varying float vBloodOpacity;
 
         void main () {
 
@@ -78,7 +82,7 @@ export class BloodSplatterMaterial extends ShaderMaterial {
             // mixColor = step( vec3(0.3), vec3(1.5) );
 
             gl_FragColor.rgb = mixColor;
-            gl_FragColor.a = 1.0 - uFading; // * 0.001;
+            gl_FragColor.a = ( 1.0 - uFading ) * vBloodOpacity; // * 0.001;
 
         }`,
         this.transparent = true,

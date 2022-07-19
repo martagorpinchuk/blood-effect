@@ -6,8 +6,8 @@ import { GroundBloodSplatter } from './GroundBloodSplatter';
 
 export class BloodGfx {
 
-    public bloodSplatter = new BloodSplatter();
-    public groundBloodSplatter = new GroundBloodSplatter();
+    public bloodSplatter: BloodSplatter;
+    public groundBloodSplatter: GroundBloodSplatter;
     public clock: Clock;
     public delta: number;
     public elapsedTimeBlood: number = 0;
@@ -34,7 +34,7 @@ export class BloodGfx {
 
     public addGroundBloodSplatter () : void {
 
-        this.groundBloodSplatter = new GroundBloodSplatter();
+        this.groundBloodSplatter = new GroundBloodSplatter( this.bloodSplatter.splashPositionX, this.bloodSplatter.splashPositionZ );
 
     };
 
@@ -47,11 +47,16 @@ export class BloodGfx {
             this.delta = this.clock.getDelta() * 1000;
             this.elapsedTimeBlood += this.delta;
 
-            this.groundBloodSplatter.update( elapsedTime );
+            this.groundBloodSplatter.update( elapsedTime, this.bloodSplatter.splashPositionX, this.bloodSplatter.splashPositionZ );
             this.groundBloodSplatter.material.uniforms.uVisibility.value = 1.0;
             this.groundBloodSplatter.material.uniforms.uFading.value = this.elapsedTimeBlood * 0.001;
 
         };
+
+        this.groundBloodSplatter.geometry.attributes.transformRow1.needsUpdate = true;
+        this.groundBloodSplatter.geometry.attributes.transformRow2.needsUpdate = true;
+        this.groundBloodSplatter.geometry.attributes.transformRow3.needsUpdate = true;
+        this.groundBloodSplatter.geometry.attributes.transformRow4.needsUpdate = true;
 
     };
 

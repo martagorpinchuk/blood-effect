@@ -17,8 +17,6 @@ const GroundBloodSplatter_1 = __webpack_require__(/*! ./GroundBloodSplatter */ "
 //
 class BloodGfx {
     constructor() {
-        this.bloodSplatter = new BloodSplatter_1.BloodSplatter();
-        this.groundBloodSplatter = new GroundBloodSplatter_1.GroundBloodSplatter();
         this.elapsedTimeBlood = 0;
         this.wrapper = new three_2.Object3D();
         this.clock = new three_2.Clock();
@@ -33,7 +31,7 @@ class BloodGfx {
     }
     ;
     addGroundBloodSplatter() {
-        this.groundBloodSplatter = new GroundBloodSplatter_1.GroundBloodSplatter();
+        this.groundBloodSplatter = new GroundBloodSplatter_1.GroundBloodSplatter(this.bloodSplatter.splashPositionX, this.bloodSplatter.splashPositionZ);
     }
     ;
     update(elapsedTime) {
@@ -41,11 +39,15 @@ class BloodGfx {
         if (this.bloodSplatter.bloodDisappear) {
             this.delta = this.clock.getDelta() * 1000;
             this.elapsedTimeBlood += this.delta;
-            this.groundBloodSplatter.update(elapsedTime);
+            this.groundBloodSplatter.update(elapsedTime, this.bloodSplatter.splashPositionX, this.bloodSplatter.splashPositionZ);
             this.groundBloodSplatter.material.uniforms.uVisibility.value = 1.0;
             this.groundBloodSplatter.material.uniforms.uFading.value = this.elapsedTimeBlood * 0.001;
         }
         ;
+        this.groundBloodSplatter.geometry.attributes.transformRow1.needsUpdate = true;
+        this.groundBloodSplatter.geometry.attributes.transformRow2.needsUpdate = true;
+        this.groundBloodSplatter.geometry.attributes.transformRow3.needsUpdate = true;
+        this.groundBloodSplatter.geometry.attributes.transformRow4.needsUpdate = true;
     }
     ;
 }
@@ -69,9 +71,6 @@ const BloodSplatter_Shader_1 = __webpack_require__(/*! ./shaders/BloodSplatter.S
 //
 class BloodSplatter {
     constructor() {
-        // public positionX: number = 0;
-        // public positionY: number = 0;
-        // public positionZ: number = - 0.29;
         this.wrapper = new three_3.Object3D();
         this.elapsedTimeFall = 0;
         this.bloodDisappear = false;
@@ -81,6 +80,9 @@ class BloodSplatter {
         this.size = [];
         this.colorCoef = [];
         this.shape = [];
+        this.bloodOpacity = [];
+        this.splashPositionX = [];
+        this.splashPositionZ = [];
         this.generate();
         this.clock = new three_3.Clock();
     }
@@ -99,20 +101,21 @@ class BloodSplatter {
         const transformRow4 = [];
         for (let i = 0; i < this.numberOfBloodDrops; i++) {
             this.rotationX = 0; //Math.PI / 3;
-            this.rotationY = Math.PI / 2; //Math.PI / 9;
+            this.rotationY = Math.PI / 3; //Math.PI / 9;
             this.rotationZ = 0; //Math.PI / 2;
             let positionX = 0; //( Math.random() - 0.5 ) * 3;
-            let positionY = 0.5;
+            let positionY = 1;
             let positionZ = 0; //( Math.random() - 0.5 ) * 3;
             let transformMatrix = new three_3.Matrix4().compose(new three_3.Vector3(positionX, positionY, positionZ), new three_3.Quaternion().setFromEuler(new three_3.Euler(this.rotationX, this.rotationY, this.rotationZ)), new three_3.Vector3(0.5, 0.5, 0.5)).toArray();
             transformRow1.push(transformMatrix[0], transformMatrix[1], transformMatrix[2], transformMatrix[3]);
             transformRow2.push(transformMatrix[4], transformMatrix[5], transformMatrix[6], transformMatrix[7]);
             transformRow3.push(transformMatrix[8], transformMatrix[9], transformMatrix[10], transformMatrix[11]);
             transformRow4.push(transformMatrix[12], transformMatrix[13], transformMatrix[14], transformMatrix[15]);
-            this.velocity.push(Math.random() * 2, Math.random() * 2, Math.random() * 2);
+            this.velocity.push(Math.random() * 9, (Math.random() + 0.5) * 8, Math.random() * 9);
             this.size.push(Math.random() * 1);
             this.colorCoef.push((Math.random() + 0.5) * 1.4);
             this.shape.push(Math.random());
+            this.bloodOpacity.push(1);
         }
         this.positions = [
             -1.0, -1.0, 0.0,
@@ -140,6 +143,7 @@ class BloodSplatter {
         this.geometry.setAttribute('size', new three_3.InstancedBufferAttribute(new Float32Array(this.size), 1));
         this.geometry.setAttribute('colorCoef', new three_3.InstancedBufferAttribute(new Float32Array(this.colorCoef), 1));
         this.geometry.setAttribute('shape', new three_3.InstancedBufferAttribute(new Float32Array(this.shape), 1));
+        this.geometry.setAttribute('bloodOpacity', new three_3.InstancedBufferAttribute(new Float32Array(this.bloodOpacity), 1));
         this.wrapper.add(this.bloodSplatter);
     }
     ;
@@ -147,36 +151,51 @@ class BloodSplatter {
         this.material.uniforms.uTime.value = elapsedTime;
         this.timeOfFall = this.clock.getDelta() * 1000;
         this.elapsedTimeFall += this.timeOfFall;
-        this.material.uniforms.uBloodTime.value = Math.abs(Math.sin(this.elapsedTimeFall * 0.001 + Math.PI / 8) * 1.5);
-        if (this.material.uniforms.uBloodTime.value.toFixed(1) == 1.5) {
-            this.clock.stop();
-            if (this.bloodSplatter) {
-                this.material.dispose();
-                this.geometry.dispose();
-                this.wrapper.remove(this.bloodSplatter);
-            }
-            this.bloodDisappear = true;
-        }
         for (let i = 0; i < this.numberOfBloodDrops; i++) {
             let newPositionX = this.geometry.attributes.transformRow4.getX(i);
             let newPositionY = this.geometry.attributes.transformRow4.getY(i);
             let newPositionZ = this.geometry.attributes.transformRow4.getZ(i);
-            let velocityX = this.geometry.attributes.velocity.getX(i);
-            let velocityY = this.geometry.attributes.velocity.getY(i);
-            let velocityZ = this.geometry.attributes.velocity.getZ(i);
-            // let rotationX = this.geometry.attributes.transformRow1.getX( i );
-            // let rotationZ = this.geometry.attributes.transformRow1.getX( i );
-            newPositionX = -Math.abs(Math.sin(this.elapsedTimeFall * 0.001) * 1.5) * velocityX;
-            newPositionY = -Math.abs(Math.sin(this.elapsedTimeFall * 0.001) * 1.5) * velocityY;
-            newPositionZ = -Math.abs(Math.sin(this.elapsedTimeFall * 0.001) * 1.5) * velocityZ;
-            // rotationX += - Math.abs( Math.sin( this.elapsedTimeFall * 0.001 ) * 1.5 ) * velocityZ;
+            let velocityX = this.geometry.attributes.velocity.getX(i) * 0.1;
+            let velocityY = this.geometry.attributes.velocity.getY(i) * 0.1;
+            let velocityZ = this.geometry.attributes.velocity.getZ(i) * 0.1;
+            // let cos1X = this.geometry.attributes.transformRow1.getX( i );
+            // let sin1Y = this.geometry.attributes.transformRow1.getY( i );
+            // let sin2X = this.geometry.attributes.transformRow2.getX( i );
+            // let cos2Y = this.geometry.attributes.transformRow2.getY( i );
+            // let rotZ = this.geometry.attributes.transformRow3.getZ( i );
+            if (+newPositionY.toFixed(1) === 0) {
+                // this.clock.stop();
+                let bloodOpacity = this.geometry.attributes.bloodOpacity.getX(i);
+                bloodOpacity = 0;
+                this.geometry.attributes.bloodOpacity.setX(i, bloodOpacity);
+                this.geometry.attributes.bloodOpacity.needsUpdate = true;
+                this.bloodDisappear = true;
+                if (this.bloodDisappear) {
+                    this.splashPositionX.push(newPositionX);
+                    this.splashPositionZ.push(newPositionZ);
+                }
+            }
+            newPositionX += -velocityX * this.elapsedTimeFall * 0.0001; // - Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityX;
+            newPositionY += -velocityY * this.elapsedTimeFall * 0.0001; //- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityY;
+            newPositionZ += -velocityZ * this.elapsedTimeFall * 0.0001; //- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityZ;
+            // cos1X += newPositionX * Math.cos( Math.PI / this.elapsedTimeFall * 1 );//- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityZ;
+            // sin1Y += newPositionX * Math.sin( Math.PI / this.elapsedTimeFall * 1 );
+            // sin2X += newPositionY * Math.sin( Math.PI / this.elapsedTimeFall * 1 );//- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityZ;
+            // cos2Y += newPositionY * Math.cos( Math.PI / this.elapsedTimeFall * 1 );
+            // rotZ += newPositionZ;//Math.PI / this.elapsedTimeFall * 1;
             this.geometry.attributes.transformRow4.setX(i, newPositionX);
             this.geometry.attributes.transformRow4.setY(i, newPositionY);
             this.geometry.attributes.transformRow4.setZ(i, newPositionZ);
-            // this.geometry.attributes.transformRow1.setX( i, rotationX );
-            // newPositionX +=
+            // this.geometry.attributes.transformRow1.setX( i, cos1X );
+            // this.geometry.attributes.transformRow1.setY( i, sin1Y );
+            // this.geometry.attributes.transformRow2.setX( i, sin2X );
+            // this.geometry.attributes.transformRow2.setY( i, cos2Y );
+            // this.geometry.attributes.transformRow3.setZ( i, rotZ );
+            this.geometry.attributes.transformRow1.needsUpdate = true;
+            this.geometry.attributes.transformRow2.needsUpdate = true;
+            this.geometry.attributes.transformRow3.needsUpdate = true;
+            this.geometry.attributes.transformRow4.needsUpdate = true;
         }
-        this.geometry.attributes.transformRow4.needsUpdate = true;
     }
     ;
 }
@@ -199,18 +218,18 @@ const three_4 = __webpack_require__(/*! three */ "./node_modules/three/build/thr
 const GroundBloodSplatter_Shader_1 = __webpack_require__(/*! ./shaders/GroundBloodSplatter.Shader */ "./src/scripts/shaders/GroundBloodSplatter.Shader.ts");
 //
 class GroundBloodSplatter {
-    constructor() {
+    constructor(splashPositionX, splashPositionZ) {
         this.wrapper = new three_4.Object3D();
-        this.numberOfBloodDrops = 5;
+        this.numberOfBloodDrops = 9;
         this.positions = [];
         this.size = [];
         this.colorCoef = [];
         this.shape = [];
         this.noiseFade = [];
-        this.generate();
+        this.generate(splashPositionX, splashPositionZ);
     }
     ;
-    generate() {
+    generate(splashPositionX, splashPositionZ) {
         this.geometry = new three_4.InstancedBufferGeometry();
         this.material = new GroundBloodSplatter_Shader_1.GroundBloodSplatterMaterial();
         this.groundBloodSplatter = new three_4.Mesh(this.geometry, this.material);
@@ -222,9 +241,9 @@ class GroundBloodSplatter {
             let rotationX = -Math.PI / 2;
             let rotationY = 0; //Math.PI / 2;
             let rotationZ = 0; //Math.PI / 2;
-            let positionX = (Math.random()) * 2;
+            let positionX = 1; //splashPositionX[ i ];
             let positionY = 0.01;
-            let positionZ = (Math.random() - 1) * 2;
+            let positionZ = 1; //splashPositionZ[ i ];
             let transformMatrix = new three_4.Matrix4().compose(new three_4.Vector3(positionX, positionY, positionZ), new three_4.Quaternion().setFromEuler(new three_4.Euler(rotationX, rotationY, rotationZ)), new three_4.Vector3(0.4, 0.4, 0.4)).toArray();
             transformRow1.push(transformMatrix[0], transformMatrix[1], transformMatrix[2], transformMatrix[3]);
             transformRow2.push(transformMatrix[4], transformMatrix[5], transformMatrix[6], transformMatrix[7]);
@@ -262,8 +281,20 @@ class GroundBloodSplatter {
         this.wrapper.add(this.groundBloodSplatter);
     }
     ;
-    update(elapsedTime) {
+    update(elapsedTime, splashPositionX, splashPositionZ) {
         // this.material.uniforms.uBloodTime.value = elapsedTime;
+        for (let i = 0; i < this.numberOfBloodDrops; i++) {
+            let newPositionX = this.geometry.attributes.transformRow4.getX(i);
+            let newPositionZ = this.geometry.attributes.transformRow4.getZ(i);
+            newPositionX = splashPositionX[i];
+            newPositionZ = splashPositionZ[i];
+            this.geometry.attributes.transformRow4.setX(i, newPositionX);
+            this.geometry.attributes.transformRow4.setZ(i, newPositionZ);
+            this.geometry.attributes.transformRow1.needsUpdate = true;
+            this.geometry.attributes.transformRow2.needsUpdate = true;
+            this.geometry.attributes.transformRow3.needsUpdate = true;
+            this.geometry.attributes.transformRow4.needsUpdate = true;
+        }
     }
     ;
 }
@@ -319,7 +350,7 @@ class Main {
             this.sizes.height = window.innerHeight;
         // Camera
         this.camera = new three_1.PerspectiveCamera(45, this.sizes.width / this.sizes.height, 0.1, 100);
-        this.camera.position.set(5.3, 3, 0);
+        this.camera.position.set(3.3, 2.1, 0);
         this.scene.add(this.camera);
         const ambientLight = new three_1.AmbientLight(0xffffff, 0.4);
         this.scene.add(ambientLight);
@@ -396,6 +427,7 @@ class BloodSplatterMaterial extends three_5.ShaderMaterial {
         varying vec2 vUv;
         varying float vColorCoef;
         varying float vShape;
+        varying float vBloodOpacity;
 
         uniform float uTime;
         uniform float uBloodTime;
@@ -407,6 +439,7 @@ class BloodSplatterMaterial extends three_5.ShaderMaterial {
         attribute float size;
         attribute float colorCoef;
         attribute float shape;
+        attribute float bloodOpacity;
 
         void main () {
 
@@ -421,15 +454,16 @@ class BloodSplatterMaterial extends three_5.ShaderMaterial {
             // pos.y += cos( uBloodTime ) * 0.6;
             // pos.x += sin( uBloodTime ) * 0.6;
 
-            // gl_Position = projectionMatrix * modelViewMatrix * transforms + vec4( position * size, 1.0 );
+            // gl_Position = projectionMatrix * modelViewMatrix * transforms * vec4( position * size, 1.0 );
 
-            gl_Position = projectionMatrix * ( modelViewMatrix * transforms * vec4( 0.0, 0.0, 0.0, 1.0 ) + vec4( position * size, 1.0 ) );
+            gl_Position = projectionMatrix * ( modelViewMatrix * transforms * vec4( 0.0, 0.0, position.z, 1.0 ) + vec4( position * size, 1.0 ) );
 
             // gl_Position = projectionMatrix * ( modelViewMatrix * transforms * vec4( 0.0, 0.0, 0.0, 1.0 ) + vec4( pos, 1.0 ) );
 
             vUv = uv;
             vColorCoef = colorCoef;
             vShape = shape;
+            vBloodOpacity = bloodOpacity;
 
         }`,
             this.fragmentShader = `
@@ -442,6 +476,7 @@ class BloodSplatterMaterial extends three_5.ShaderMaterial {
         varying vec2 vUv;
         varying float vColorCoef;
         varying float vShape;
+        varying float vBloodOpacity;
 
         void main () {
 
@@ -458,7 +493,7 @@ class BloodSplatterMaterial extends three_5.ShaderMaterial {
             // mixColor = step( vec3(0.3), vec3(1.5) );
 
             gl_FragColor.rgb = mixColor;
-            gl_FragColor.a = 1.0 - uFading; // * 0.001;
+            gl_FragColor.a = ( 1.0 - uFading ) * vBloodOpacity; // * 0.001;
 
         }`,
             this.transparent = true,

@@ -10,20 +10,20 @@ export class GroundBloodSplatter {
     public geometry: InstancedBufferGeometry;
     public wrapper: Object3D = new Object3D();
     public groundBloodSplatter: Mesh;
-    public numberOfBloodDrops: number = 5;
+    public numberOfBloodDrops: number = 9;
     public positions: Array<number> = [];
     public size: Array<number> = [];
     public colorCoef: Array<number> = [];
     public shape: Array<number> = [];
     public noiseFade: Array<number> = [];
 
-    constructor () {
+    constructor ( splashPositionX: Array<number>, splashPositionZ: Array<number> ) {
 
-        this.generate();
+        this.generate( splashPositionX, splashPositionZ );
 
     };
 
-    public generate () : void {
+    public generate ( splashPositionX, splashPositionZ ) : void {
 
         this.geometry = new InstancedBufferGeometry();
         this.material = new GroundBloodSplatterMaterial();
@@ -41,9 +41,9 @@ export class GroundBloodSplatter {
             let rotationY = 0;//Math.PI / 2;
             let rotationZ = 0;//Math.PI / 2;
 
-            let positionX = ( Math.random() ) * 2;
+            let positionX = 1;//splashPositionX[ i ];
             let positionY = 0.01;
-            let positionZ = ( Math.random() - 1 ) * 2;
+            let positionZ = 1;//splashPositionZ[ i ];
 
             let transformMatrix = new Matrix4().compose( new Vector3( positionX, positionY, positionZ ), new Quaternion().setFromEuler( new Euler( rotationX, rotationY, rotationZ ) ), new Vector3( 0.4, 0.4, 0.4 ) ).toArray();
 
@@ -97,9 +97,27 @@ export class GroundBloodSplatter {
 
     };
 
-    public update ( elapsedTime ) {
+    public update ( elapsedTime, splashPositionX, splashPositionZ ) {
 
         // this.material.uniforms.uBloodTime.value = elapsedTime;
+
+        for ( let i = 0; i < this.numberOfBloodDrops; i ++ ) {
+
+            let newPositionX = this.geometry.attributes.transformRow4.getX( i );
+            let newPositionZ = this.geometry.attributes.transformRow4.getZ( i );
+
+            newPositionX = splashPositionX[ i ];
+            newPositionZ = splashPositionZ[ i ];
+
+            this.geometry.attributes.transformRow4.setX( i, newPositionX );
+            this.geometry.attributes.transformRow4.setZ( i, newPositionZ );
+
+            this.geometry.attributes.transformRow1.needsUpdate = true;
+            this.geometry.attributes.transformRow2.needsUpdate = true;
+            this.geometry.attributes.transformRow3.needsUpdate = true;
+            this.geometry.attributes.transformRow4.needsUpdate = true;
+
+        }
 
     };
 

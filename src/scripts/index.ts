@@ -48,7 +48,7 @@ class Main {
 
         // Camera
         this.camera = new PerspectiveCamera( 45, this.sizes.width / this.sizes.height, 0.1, 100 );
-        this.camera.position.set( 5.3, 3, 0 );
+        this.camera.position.set( 3.3, 2.1, 0 );
         this.scene.add( this.camera );
 
         const ambientLight = new AmbientLight( 0xffffff, 0.4 );
