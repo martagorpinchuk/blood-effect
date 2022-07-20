@@ -16,9 +16,9 @@ const BloodSplatter_1 = __webpack_require__(/*! ./BloodSplatter */ "./src/script
 const GroundBloodSplatter_1 = __webpack_require__(/*! ./GroundBloodSplatter */ "./src/scripts/GroundBloodSplatter.ts");
 //
 class BloodGfx {
-    constructor() {
+    constructor(fadingCoef, timeCoef) {
         this.elapsedTimeBlood = 0;
-        this.fadingCoef = 1;
+        // public fadingCoef: number = 1;
         this.wrapper = new three_2.Object3D();
         this.clock = new three_2.Clock();
         this.addBloodSplatter();
@@ -36,14 +36,14 @@ class BloodGfx {
         this.groundBloodSplatter = new GroundBloodSplatter_1.GroundBloodSplatter(this.bloodSplatter.splashPositionX, this.bloodSplatter.splashPositionZ);
     }
     ;
-    update(elapsedTime) {
-        this.bloodSplatter.update(elapsedTime);
+    update(elapsedTime, fadingCoef, timeCoef) {
+        this.bloodSplatter.update(elapsedTime, timeCoef);
         if (this.bloodSplatter.bloodDisappear) {
             this.delta = this.clock.getDelta() * 1000;
             this.elapsedTimeBlood += this.delta;
             this.groundBloodSplatter.update(elapsedTime, this.bloodSplatter.splashPositionX, this.bloodSplatter.splashPositionZ);
             this.groundBloodSplatter.material.uniforms.uVisibility.value = 1.0;
-            this.groundBloodSplatter.material.uniforms.uFading.value = this.elapsedTimeBlood * 0.001 * this.fadingCoef;
+            this.groundBloodSplatter.material.uniforms.uFading.value = this.elapsedTimeBlood * 0.001 * fadingCoef;
         }
         ;
         this.groundBloodSplatter.geometry.attributes.transformRow1.needsUpdate = true;
@@ -72,6 +72,7 @@ const three_3 = __webpack_require__(/*! three */ "./node_modules/three/build/thr
 const BloodSplatter_Shader_1 = __webpack_require__(/*! ./shaders/BloodSplatter.Shader */ "./src/scripts/shaders/BloodSplatter.Shader.ts");
 //
 class BloodSplatter {
+    // public timeCoef: number = 1;
     constructor() {
         this.wrapper = new three_3.Object3D();
         this.elapsedTimeFall = 0;
@@ -85,7 +86,6 @@ class BloodSplatter {
         this.bloodOpacity = [];
         this.splashPositionX = [];
         this.splashPositionZ = [];
-        this.timeCoef = 1;
         this.generate();
         this.clock = new three_3.Clock();
     }
@@ -154,7 +154,7 @@ class BloodSplatter {
         this.wrapper.add(this.mesh);
     }
     ;
-    update(elapsedTime) {
+    update(elapsedTime, timeCoef) {
         this.material.uniforms.uTime.value = elapsedTime;
         this.timeOfFall = this.clock.getDelta() * 1000;
         this.elapsedTimeFall += this.timeOfFall;
@@ -182,9 +182,9 @@ class BloodSplatter {
                     this.splashPositionZ.push(newPositionZ);
                 }
             }
-            newPositionX += -velocityX * this.elapsedTimeFall * 0.0001 * this.timeCoef; // - Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityX;
-            newPositionY += -velocityY * this.elapsedTimeFall * 0.0001 * this.timeCoef; //- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityY;
-            newPositionZ += -velocityZ * this.elapsedTimeFall * 0.0001 * this.timeCoef; //- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityZ;
+            newPositionX += -velocityX * this.elapsedTimeFall * 0.0001 * timeCoef; // - Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityX;
+            newPositionY += -velocityY * this.elapsedTimeFall * 0.0001 * timeCoef; //- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityY;
+            newPositionZ += -velocityZ * this.elapsedTimeFall * 0.0001 * timeCoef; //- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityZ;
             // cos1X += newPositionX * Math.cos( Math.PI / this.elapsedTimeFall * 1 );//- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityZ;
             // sin1Y += newPositionX * Math.sin( Math.PI / this.elapsedTimeFall * 1 );
             // sin2X += newPositionY * Math.sin( Math.PI / this.elapsedTimeFall * 1 );//- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityZ;
@@ -331,6 +331,8 @@ const tweakpane_1 = __webpack_require__(/*! tweakpane */ "./node_modules/tweakpa
 class Main {
     constructor() {
         this.elapsedTime = 0;
+        this.fadingCoef = 1;
+        this.timeCoef = 1;
         this.sizes = {
             width: 0,
             height: 0
@@ -343,7 +345,7 @@ class Main {
                 this.resize();
             }
             if (this.bloodGfx)
-                this.bloodGfx.update(this.elapsedTime);
+                this.bloodGfx.update(this.elapsedTime, this.fadingCoef, this.timeCoef);
             this.controls.update();
             this.renderer.render(this.scene, this.camera);
             if (Math.round(this.elapsedTime) > 4500) {
@@ -413,7 +415,7 @@ class Main {
             this.bloodGfx.groundBloodSplatter.geometry.dispose();
             this.scene.remove(this.bloodGfx.wrapper);
         }
-        this.bloodGfx = new Blood_1.BloodGfx();
+        this.bloodGfx = new Blood_1.BloodGfx(this.fadingCoef, this.timeCoef);
         this.scene.add(this.bloodGfx.wrapper);
     }
     ;
@@ -430,13 +432,11 @@ class Main {
             this.bloodGfx.groundBloodSplatter.material.uniforms.uColorLight.value.setHex(parseInt(props.bloodGroundColor.replace('#', '0x')));
         });
         color.addInput(props, 'bloodColor', { label: 'Blood color' }).on('change', () => {
-            this.bloodGfx.groundBloodSplatter.material.uniforms.uColorLight.value.setHex(parseInt(props.bloodColor.replace('#', '0x')));
+            this.bloodGfx.bloodSplatter.material.uniforms.uColorLight.value.setHex(parseInt(props.bloodColor.replace('#', '0x')));
         });
         //
-        bloodSpeed.addInput(this.bloodGfx.bloodSplatter, 'timeCoef', { min: 0.01, max: 2, label: 'Falling blood speed' }).on('change', () => {
-            // th
-        });
-        bloodSpeed.addInput(this.bloodGfx, 'fadingCoef', { min: 0.01, max: 2, label: 'Ground fading speed' });
+        bloodSpeed.addInput(this, 'timeCoef', { min: 0.01, max: 2, label: 'Falling blood speed' });
+        bloodSpeed.addInput(this, 'fadingCoef', { min: 0.01, max: 2, label: 'Ground fading speed' });
     }
     ;
     resize() {

@@ -25,7 +25,7 @@ export class BloodSplatter {
     public bloodOpacity: Array<number> = [];
     public splashPositionX: Array<number> = [];
     public splashPositionZ: Array<number> = [];
-    public timeCoef: number = 1;
+    // public timeCoef: number = 1;
 
     constructor () {
 
@@ -128,7 +128,7 @@ export class BloodSplatter {
 
     };
 
-    public update ( elapsedTime ) : void {
+    public update ( elapsedTime, timeCoef ) : void {
 
         this.material.uniforms.uTime.value = elapsedTime;
 
@@ -173,9 +173,9 @@ export class BloodSplatter {
                 }
             }
 
-            newPositionX += - velocityX * this.elapsedTimeFall * 0.0001 * this.timeCoef;// - Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityX;
-            newPositionY += - velocityY * this.elapsedTimeFall * 0.0001 * this.timeCoef;//- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityY;
-            newPositionZ += - velocityZ * this.elapsedTimeFall * 0.0001 * this.timeCoef;//- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityZ;
+            newPositionX += - velocityX * this.elapsedTimeFall * 0.0001 * timeCoef;// - Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityX;
+            newPositionY += - velocityY * this.elapsedTimeFall * 0.0001 * timeCoef;//- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityY;
+            newPositionZ += - velocityZ * this.elapsedTimeFall * 0.0001 * timeCoef;//- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityZ;
 
             // cos1X += newPositionX * Math.cos( Math.PI / this.elapsedTimeFall * 1 );//- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityZ;
             // sin1Y += newPositionX * Math.sin( Math.PI / this.elapsedTimeFall * 1 );

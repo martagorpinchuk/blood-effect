@@ -19,6 +19,8 @@ class Main {
     public clock: Clock;
     public material: BloodSplatterMaterial;
     public bloodSplatter: Mesh;
+    public fadingCoef: number = 1;
+    public timeCoef: number = 1;
 
     public bloodGfx: BloodGfx;
 
@@ -111,7 +113,7 @@ class Main {
 
         }
 
-        this.bloodGfx = new BloodGfx();
+        this.bloodGfx = new BloodGfx( this.fadingCoef, this.timeCoef );
         this.scene.add( this.bloodGfx.wrapper );
 
     };
@@ -139,18 +141,14 @@ class Main {
 
         color.addInput( props, 'bloodColor', { label: 'Blood color' } ).on( 'change', () => {
 
-            this.bloodGfx.groundBloodSplatter.material.uniforms.uColorLight.value.setHex( parseInt( props.bloodColor.replace( '#', '0x' ) ) );
+            this.bloodGfx.bloodSplatter.material.uniforms.uColorLight.value.setHex( parseInt( props.bloodColor.replace( '#', '0x' ) ) );
 
         } );
 
         //
 
-        bloodSpeed.addInput( this.bloodGfx.bloodSplatter, 'timeCoef', { min: 0.01, max: 2, label: 'Falling blood speed' } ).on( 'change', () => {
-
-            // th
-
-        } );
-        bloodSpeed.addInput( this.bloodGfx, 'fadingCoef', { min: 0.01, max: 2, label: 'Ground fading speed' } );
+        bloodSpeed.addInput( this, 'timeCoef', { min: 0.01, max: 2, label: 'Falling blood speed' } );
+        bloodSpeed.addInput( this, 'fadingCoef', { min: 0.01, max: 2, label: 'Ground fading speed' } );
 
     };
 
@@ -180,7 +178,7 @@ class Main {
 
         }
 
-        if ( this.bloodGfx ) this.bloodGfx.update( this.elapsedTime );
+        if ( this.bloodGfx ) this.bloodGfx.update( this.elapsedTime, this.fadingCoef, this.timeCoef );
 
         this.controls.update();
         this.renderer.render( this.scene, this.camera );

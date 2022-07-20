@@ -12,11 +12,11 @@ export class BloodGfx {
     public clock: Clock;
     public delta: number;
     public elapsedTimeBlood: number = 0;
-    public fadingCoef: number = 1;
+    // public fadingCoef: number = 1;
 
     public wrapper: Object3D = new Object3D();
 
-    constructor () {
+    constructor ( fadingCoef, timeCoef ) {
 
         this.clock = new Clock();
 
@@ -42,9 +42,9 @@ export class BloodGfx {
 
     };
 
-    public update ( elapsedTime ) : void {
+    public update ( elapsedTime, fadingCoef, timeCoef ) : void {
 
-        this.bloodSplatter.update( elapsedTime );
+        this.bloodSplatter.update( elapsedTime, timeCoef );
 
         if( this.bloodSplatter.bloodDisappear ) {
 
@@ -53,7 +53,7 @@ export class BloodGfx {
 
             this.groundBloodSplatter.update( elapsedTime, this.bloodSplatter.splashPositionX, this.bloodSplatter.splashPositionZ );
             this.groundBloodSplatter.material.uniforms.uVisibility.value = 1.0;
-            this.groundBloodSplatter.material.uniforms.uFading.value = this.elapsedTimeBlood * 0.001 * this.fadingCoef;
+            this.groundBloodSplatter.material.uniforms.uFading.value = this.elapsedTimeBlood * 0.001 * fadingCoef;
 
         };
 
