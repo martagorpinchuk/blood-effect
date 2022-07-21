@@ -43,7 +43,7 @@ class Main {
 
         // Scene
         this.scene = new Scene();
-        this.scene.background = new Color( '#b3afbd' ); //324345 - at night  // b2eef5
+        this.scene.background = new Color( '#b3afbd' );
 
         // Sizes
         this.sizes.width = window.innerWidth,
@@ -59,7 +59,6 @@ class Main {
 
         // Controls
         this.controls = new MapControls( this.camera, this.canvas );
-        // this.controls.enableZoom = false;
 
         // Renderer
         this.renderer = new WebGLRenderer({ canvas: this.canvas, antialias: true });

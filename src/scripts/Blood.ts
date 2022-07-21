@@ -12,7 +12,6 @@ export class BloodGfx {
     public clock: Clock;
     public delta: number;
     public elapsedTimeBlood: number = 0;
-    // public fadingCoef: number = 1;
 
     public wrapper: Object3D = new Object3D();
 
@@ -22,8 +21,6 @@ export class BloodGfx {
 
         this.addBloodSplatter();
         this.addGroundBloodSplatter();
-
-        // this.debug();
 
         this.wrapper.add( this.bloodSplatter.wrapper );
         this.wrapper.add( this.groundBloodSplatter.wrapper );
@@ -63,39 +60,5 @@ export class BloodGfx {
         this.groundBloodSplatter.geometry.attributes.transformRow4.needsUpdate = true;
 
     };
-
-    // public debug () : void {
-
-    //     const props = {
-
-    //         bloodGroundColor: '#ff0000',
-    //         bloodColor: '#ff0000'
-
-    //     };
-
-    //     let pane = new Pane(  { title: "Explosion" } ); //  expanded: false
-    //     pane.element.parentElement.style['width'] = '330px';
-
-    //     let color = pane.addFolder( { title: "Blood color" } );
-    //     let bloodSpeed = pane.addFolder( { title: "Speed" } );
-
-    //     color.addInput( props, 'bloodGroundColor', { label: 'Ground blood color' } ).on( 'change', () => {
-
-    //         this.groundBloodSplatter.material.uniforms.uColorLight.value.setHex( parseInt( props.bloodGroundColor.replace( '#', '0x' ) ) );
-
-    //     } );
-
-    //     color.addInput( props, 'bloodColor', { label: 'Blood color' } ).on( 'change', () => {
-
-    //         this.groundBloodSplatter.material.uniforms.uColorLight.value.setHex( parseInt( props.bloodColor.replace( '#', '0x' ) ) );
-
-    //     } );
-
-    //     //
-
-    //     bloodSpeed.addInput( this.bloodSplatter, 'timeCoef', { min: 0.01, max: 2, label: 'Falling blood speed' } );
-    //     bloodSpeed.addInput( this, 'fadingCoef', { min: 0.01, max: 2, label: 'Falling blood speed' } );
-
-    // };
 
 };

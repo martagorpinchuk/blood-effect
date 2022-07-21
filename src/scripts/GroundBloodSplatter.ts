@@ -45,12 +45,12 @@ export class GroundBloodSplatter {
         for ( let i = 0; i < this.numberOfBloodDrops; i ++ ) {
 
             let rotationX = - Math.PI / 2;
-            let rotationY = 0;//Math.PI / 2;
-            let rotationZ = 0;//Math.PI / 2;
+            let rotationY = 0;
+            let rotationZ = 0;
 
-            let positionX = 1;//splashPositionX[ i ];
+            let positionX = 1;
             let positionY = 0.01;
-            let positionZ = 1;//splashPositionZ[ i ];
+            let positionZ = 1;
 
             let transformMatrix = new Matrix4().compose( new Vector3( positionX, positionY, positionZ ), new Quaternion().setFromEuler( new Euler( rotationX, rotationY, rotationZ ) ), new Vector3( 0.4, 0.4, 0.4 ) ).toArray();
 
@@ -105,8 +105,6 @@ export class GroundBloodSplatter {
     };
 
     public update ( elapsedTime, splashPositionX, splashPositionZ ) {
-
-        // this.material.uniforms.uBloodTime.value = elapsedTime;
 
         for ( let i = 0; i < this.numberOfBloodDrops; i ++ ) {
 

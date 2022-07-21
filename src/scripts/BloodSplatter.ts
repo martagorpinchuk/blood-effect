@@ -25,7 +25,6 @@ export class BloodSplatter {
     public bloodOpacity: Array<number> = [];
     public splashPositionX: Array<number> = [];
     public splashPositionZ: Array<number> = [];
-    // public timeCoef: number = 1;
 
     constructor () {
 
@@ -145,15 +144,7 @@ export class BloodSplatter {
             let velocityY = this.geometry.attributes.velocity.getY( i ) * 0.1;
             let velocityZ = this.geometry.attributes.velocity.getZ( i ) * 0.1;
 
-            // let cos1X = this.geometry.attributes.transformRow1.getX( i );
-            // let sin1Y = this.geometry.attributes.transformRow1.getY( i );
-            // let sin2X = this.geometry.attributes.transformRow2.getX( i );
-            // let cos2Y = this.geometry.attributes.transformRow2.getY( i );
-            // let rotZ = this.geometry.attributes.transformRow3.getZ( i );
-
             if ( + newPositionY.toFixed( 1 ) === 0 ) {
-
-                // this.clock.stop();
 
                 let bloodOpacity = this.geometry.attributes.bloodOpacity.getX( i );
 
@@ -173,25 +164,13 @@ export class BloodSplatter {
                 }
             }
 
-            newPositionX += - velocityX * this.elapsedTimeFall * 0.0001 * timeCoef;// - Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityX;
-            newPositionY += - velocityY * this.elapsedTimeFall * 0.0001 * timeCoef;//- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityY;
-            newPositionZ += - velocityZ * this.elapsedTimeFall * 0.0001 * timeCoef;//- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityZ;
-
-            // cos1X += newPositionX * Math.cos( Math.PI / this.elapsedTimeFall * 1 );//- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityZ;
-            // sin1Y += newPositionX * Math.sin( Math.PI / this.elapsedTimeFall * 1 );
-            // sin2X += newPositionY * Math.sin( Math.PI / this.elapsedTimeFall * 1 );//- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityZ;
-            // cos2Y += newPositionY * Math.cos( Math.PI / this.elapsedTimeFall * 1 );
-            // rotZ += newPositionZ;//Math.PI / this.elapsedTimeFall * 1;
+            newPositionX += - velocityX * this.elapsedTimeFall * 0.0001 * timeCoef;
+            newPositionY += - velocityY * this.elapsedTimeFall * 0.0001 * timeCoef;
+            newPositionZ += - velocityZ * this.elapsedTimeFall * 0.0001 * timeCoef;
 
             this.geometry.attributes.transformRow4.setX( i, newPositionX );
             this.geometry.attributes.transformRow4.setY( i, newPositionY );
             this.geometry.attributes.transformRow4.setZ( i, newPositionZ );
-
-            // this.geometry.attributes.transformRow1.setX( i, cos1X );
-            // this.geometry.attributes.transformRow1.setY( i, sin1Y );
-            // this.geometry.attributes.transformRow2.setX( i, sin2X );
-            // this.geometry.attributes.transformRow2.setY( i, cos2Y );
-            // this.geometry.attributes.transformRow3.setZ( i, rotZ );
 
             this.geometry.attributes.transformRow1.needsUpdate = true;
             this.geometry.attributes.transformRow2.needsUpdate = true;

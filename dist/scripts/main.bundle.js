@@ -18,12 +18,10 @@ const GroundBloodSplatter_1 = __webpack_require__(/*! ./GroundBloodSplatter */ "
 class BloodGfx {
     constructor(fadingCoef, timeCoef) {
         this.elapsedTimeBlood = 0;
-        // public fadingCoef: number = 1;
         this.wrapper = new three_2.Object3D();
         this.clock = new three_2.Clock();
         this.addBloodSplatter();
         this.addGroundBloodSplatter();
-        // this.debug();
         this.wrapper.add(this.bloodSplatter.wrapper);
         this.wrapper.add(this.groundBloodSplatter.wrapper);
     }
@@ -72,7 +70,6 @@ const three_3 = __webpack_require__(/*! three */ "./node_modules/three/build/thr
 const BloodSplatter_Shader_1 = __webpack_require__(/*! ./shaders/BloodSplatter.Shader */ "./src/scripts/shaders/BloodSplatter.Shader.ts");
 //
 class BloodSplatter {
-    // public timeCoef: number = 1;
     constructor() {
         this.wrapper = new three_3.Object3D();
         this.elapsedTimeFall = 0;
@@ -165,13 +162,7 @@ class BloodSplatter {
             let velocityX = this.geometry.attributes.velocity.getX(i) * 0.1;
             let velocityY = this.geometry.attributes.velocity.getY(i) * 0.1;
             let velocityZ = this.geometry.attributes.velocity.getZ(i) * 0.1;
-            // let cos1X = this.geometry.attributes.transformRow1.getX( i );
-            // let sin1Y = this.geometry.attributes.transformRow1.getY( i );
-            // let sin2X = this.geometry.attributes.transformRow2.getX( i );
-            // let cos2Y = this.geometry.attributes.transformRow2.getY( i );
-            // let rotZ = this.geometry.attributes.transformRow3.getZ( i );
             if (+newPositionY.toFixed(1) === 0) {
-                // this.clock.stop();
                 let bloodOpacity = this.geometry.attributes.bloodOpacity.getX(i);
                 bloodOpacity = 0;
                 this.geometry.attributes.bloodOpacity.setX(i, bloodOpacity);
@@ -182,22 +173,12 @@ class BloodSplatter {
                     this.splashPositionZ.push(newPositionZ);
                 }
             }
-            newPositionX += -velocityX * this.elapsedTimeFall * 0.0001 * timeCoef; // - Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityX;
-            newPositionY += -velocityY * this.elapsedTimeFall * 0.0001 * timeCoef; //- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityY;
-            newPositionZ += -velocityZ * this.elapsedTimeFall * 0.0001 * timeCoef; //- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityZ;
-            // cos1X += newPositionX * Math.cos( Math.PI / this.elapsedTimeFall * 1 );//- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityZ;
-            // sin1Y += newPositionX * Math.sin( Math.PI / this.elapsedTimeFall * 1 );
-            // sin2X += newPositionY * Math.sin( Math.PI / this.elapsedTimeFall * 1 );//- Math.abs( Math.sin( this.elapsedTimeFall * 0.01 ) * 1.5 ) * velocityZ;
-            // cos2Y += newPositionY * Math.cos( Math.PI / this.elapsedTimeFall * 1 );
-            // rotZ += newPositionZ;//Math.PI / this.elapsedTimeFall * 1;
+            newPositionX += -velocityX * this.elapsedTimeFall * 0.0001 * timeCoef;
+            newPositionY += -velocityY * this.elapsedTimeFall * 0.0001 * timeCoef;
+            newPositionZ += -velocityZ * this.elapsedTimeFall * 0.0001 * timeCoef;
             this.geometry.attributes.transformRow4.setX(i, newPositionX);
             this.geometry.attributes.transformRow4.setY(i, newPositionY);
             this.geometry.attributes.transformRow4.setZ(i, newPositionZ);
-            // this.geometry.attributes.transformRow1.setX( i, cos1X );
-            // this.geometry.attributes.transformRow1.setY( i, sin1Y );
-            // this.geometry.attributes.transformRow2.setX( i, sin2X );
-            // this.geometry.attributes.transformRow2.setY( i, cos2Y );
-            // this.geometry.attributes.transformRow3.setZ( i, rotZ );
             this.geometry.attributes.transformRow1.needsUpdate = true;
             this.geometry.attributes.transformRow2.needsUpdate = true;
             this.geometry.attributes.transformRow3.needsUpdate = true;
@@ -250,11 +231,11 @@ class GroundBloodSplatter {
         const transformRow4 = [];
         for (let i = 0; i < this.numberOfBloodDrops; i++) {
             let rotationX = -Math.PI / 2;
-            let rotationY = 0; //Math.PI / 2;
-            let rotationZ = 0; //Math.PI / 2;
-            let positionX = 1; //splashPositionX[ i ];
+            let rotationY = 0;
+            let rotationZ = 0;
+            let positionX = 1;
             let positionY = 0.01;
-            let positionZ = 1; //splashPositionZ[ i ];
+            let positionZ = 1;
             let transformMatrix = new three_4.Matrix4().compose(new three_4.Vector3(positionX, positionY, positionZ), new three_4.Quaternion().setFromEuler(new three_4.Euler(rotationX, rotationY, rotationZ)), new three_4.Vector3(0.4, 0.4, 0.4)).toArray();
             transformRow1.push(transformMatrix[0], transformMatrix[1], transformMatrix[2], transformMatrix[3]);
             transformRow2.push(transformMatrix[4], transformMatrix[5], transformMatrix[6], transformMatrix[7]);
@@ -293,7 +274,6 @@ class GroundBloodSplatter {
     }
     ;
     update(elapsedTime, splashPositionX, splashPositionZ) {
-        // this.material.uniforms.uBloodTime.value = elapsedTime;
         for (let i = 0; i < this.numberOfBloodDrops; i++) {
             let newPositionX = this.geometry.attributes.transformRow4.getX(i);
             let newPositionZ = this.geometry.attributes.transformRow4.getZ(i);
@@ -364,7 +344,7 @@ class Main {
         this.canvas = document.querySelector('canvas.webglView');
         // Scene
         this.scene = new three_1.Scene();
-        this.scene.background = new three_1.Color('#b3afbd'); //324345 - at night  // b2eef5
+        this.scene.background = new three_1.Color('#b3afbd');
         // Sizes
         this.sizes.width = window.innerWidth,
             this.sizes.height = window.innerHeight;
@@ -376,7 +356,6 @@ class Main {
         this.scene.add(ambientLight);
         // Controls
         this.controls = new OrbitControls_js_1.MapControls(this.camera, this.canvas);
-        // this.controls.enableZoom = false;
         // Renderer
         this.renderer = new three_1.WebGLRenderer({ canvas: this.canvas, antialias: true });
         this.renderer.setSize(this.sizes.width, this.sizes.height);
