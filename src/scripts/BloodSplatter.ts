@@ -25,6 +25,7 @@ export class BloodSplatter {
     public bloodOpacity: Array<number> = [];
     public splashPositionX: Array<number> = [];
     public splashPositionZ: Array<number> = [];
+    public paneSize: number = 0.1;
 
     constructor () {
 
@@ -79,7 +80,7 @@ export class BloodSplatter {
             transformRow4.push( transformMatrix[12], transformMatrix[13], transformMatrix[14], transformMatrix[15] );
 
             this.velocity.push( Math.random() * 9, ( Math.random() + 0.5 ) * 8, Math.random() * 9 );
-            this.size.push( Math.random() * 1 );
+            this.size.push( Math.random() * 0.5 );
             this.colorCoef.push( ( Math.random() + 0.5 ) * 1.4 );
             this.shape.push(  Math.random() );
             this.bloodOpacity.push( 1 );
@@ -144,7 +145,11 @@ export class BloodSplatter {
             let velocityY = this.geometry.attributes.velocity.getY( i ) * 0.1;
             let velocityZ = this.geometry.attributes.velocity.getZ( i ) * 0.1;
 
+            let size = this.geometry.attributes.size.getX( i ) + 0.01;
+
             if ( + newPositionY.toFixed( 1 ) === 0 ) {
+
+                newPositionY = 0;
 
                 let bloodOpacity = this.geometry.attributes.bloodOpacity.getX( i );
 
@@ -162,6 +167,7 @@ export class BloodSplatter {
                     this.splashPositionZ.push( newPositionZ );
 
                 }
+
             }
 
             newPositionX += - velocityX * this.elapsedTimeFall * 0.0001 * timeCoef;
@@ -172,10 +178,14 @@ export class BloodSplatter {
             this.geometry.attributes.transformRow4.setY( i, newPositionY );
             this.geometry.attributes.transformRow4.setZ( i, newPositionZ );
 
+            this.geometry.attributes.size.setX( i, size );
+
             this.geometry.attributes.transformRow1.needsUpdate = true;
             this.geometry.attributes.transformRow2.needsUpdate = true;
             this.geometry.attributes.transformRow3.needsUpdate = true;
             this.geometry.attributes.transformRow4.needsUpdate = true;
+
+            this.geometry.attributes.size.needsUpdate = true;
 
         }
 

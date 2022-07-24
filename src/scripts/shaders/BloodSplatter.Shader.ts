@@ -74,7 +74,7 @@ export class BloodSplatterMaterial extends ShaderMaterial {
 
             float noise = texture2D( uNoise, vUv ).r * 0.6;
 
-            if ( distanceToCenter > noise * vShape ) { discard; };
+            if ( distanceToCenter > noise * vShape + uTime * 0.0003 * noise ) { discard; };
 
             //
 
@@ -83,6 +83,7 @@ export class BloodSplatterMaterial extends ShaderMaterial {
 
             gl_FragColor.rgb = mixColor;
             gl_FragColor.a = ( 1.0 - uFading ) * vBloodOpacity; // * 0.001;
+            if ( gl_FragColor.a < 0.0001 ) { discard; }
 
         }`,
         this.transparent = true,

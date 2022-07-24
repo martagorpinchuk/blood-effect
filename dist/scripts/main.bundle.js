@@ -11,15 +11,15 @@
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BloodGfx = void 0;
-const three_2 = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+const three_3 = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
 const BloodSplatter_1 = __webpack_require__(/*! ./BloodSplatter */ "./src/scripts/BloodSplatter.ts");
 const GroundBloodSplatter_1 = __webpack_require__(/*! ./GroundBloodSplatter */ "./src/scripts/GroundBloodSplatter.ts");
 //
 class BloodGfx {
     constructor(fadingCoef, timeCoef) {
         this.elapsedTimeBlood = 0;
-        this.wrapper = new three_2.Object3D();
-        this.clock = new three_2.Clock();
+        this.wrapper = new three_3.Object3D();
+        this.clock = new three_3.Clock();
         this.addBloodSplatter();
         this.addGroundBloodSplatter();
         this.wrapper.add(this.bloodSplatter.wrapper);
@@ -66,12 +66,12 @@ exports.BloodGfx = BloodGfx;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BloodSplatter = void 0;
-const three_3 = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+const three_4 = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
 const BloodSplatter_Shader_1 = __webpack_require__(/*! ./shaders/BloodSplatter.Shader */ "./src/scripts/shaders/BloodSplatter.Shader.ts");
 //
 class BloodSplatter {
     constructor() {
-        this.wrapper = new three_3.Object3D();
+        this.wrapper = new three_4.Object3D();
         this.elapsedTimeFall = 0;
         this.bloodDisappear = false;
         this.numberOfBloodDrops = 5;
@@ -83,8 +83,9 @@ class BloodSplatter {
         this.bloodOpacity = [];
         this.splashPositionX = [];
         this.splashPositionZ = [];
+        this.paneSize = 0.1;
         this.generate();
-        this.clock = new three_3.Clock();
+        this.clock = new three_4.Clock();
     }
     ;
     generate() {
@@ -92,9 +93,9 @@ class BloodSplatter {
             this.geometry.dispose();
             this.wrapper.remove(this.mesh);
         }
-        this.geometry = new three_3.InstancedBufferGeometry();
+        this.geometry = new three_4.InstancedBufferGeometry();
         this.material = new BloodSplatter_Shader_1.BloodSplatterMaterial();
-        this.mesh = new three_3.Mesh(this.geometry, this.material);
+        this.mesh = new three_4.Mesh(this.geometry, this.material);
         if (this.mesh) {
             this.geometry.dispose();
             this.wrapper.remove(this.mesh);
@@ -110,13 +111,13 @@ class BloodSplatter {
             let positionX = 0; //( Math.random() - 0.5 ) * 3;
             let positionY = 1;
             let positionZ = 0; //( Math.random() - 0.5 ) * 3;
-            let transformMatrix = new three_3.Matrix4().compose(new three_3.Vector3(positionX, positionY, positionZ), new three_3.Quaternion().setFromEuler(new three_3.Euler(this.rotationX, this.rotationY, this.rotationZ)), new three_3.Vector3(0.5, 0.5, 0.5)).toArray();
+            let transformMatrix = new three_4.Matrix4().compose(new three_4.Vector3(positionX, positionY, positionZ), new three_4.Quaternion().setFromEuler(new three_4.Euler(this.rotationX, this.rotationY, this.rotationZ)), new three_4.Vector3(0.5, 0.5, 0.5)).toArray();
             transformRow1.push(transformMatrix[0], transformMatrix[1], transformMatrix[2], transformMatrix[3]);
             transformRow2.push(transformMatrix[4], transformMatrix[5], transformMatrix[6], transformMatrix[7]);
             transformRow3.push(transformMatrix[8], transformMatrix[9], transformMatrix[10], transformMatrix[11]);
             transformRow4.push(transformMatrix[12], transformMatrix[13], transformMatrix[14], transformMatrix[15]);
             this.velocity.push(Math.random() * 9, (Math.random() + 0.5) * 8, Math.random() * 9);
-            this.size.push(Math.random() * 1);
+            this.size.push(Math.random() * 0.5);
             this.colorCoef.push((Math.random() + 0.5) * 1.4);
             this.shape.push(Math.random());
             this.bloodOpacity.push(1);
@@ -137,17 +138,17 @@ class BloodSplatter {
             0, 1,
             0, 0
         ];
-        this.geometry.setAttribute('position', new three_3.Float32BufferAttribute(this.positions, 3));
-        this.geometry.setAttribute('uv', new three_3.Float32BufferAttribute(uv, 2));
-        this.geometry.setAttribute('transformRow1', new three_3.InstancedBufferAttribute(new Float32Array(transformRow1), 4));
-        this.geometry.setAttribute('transformRow2', new three_3.InstancedBufferAttribute(new Float32Array(transformRow2), 4));
-        this.geometry.setAttribute('transformRow3', new three_3.InstancedBufferAttribute(new Float32Array(transformRow3), 4));
-        this.geometry.setAttribute('transformRow4', new three_3.InstancedBufferAttribute(new Float32Array(transformRow4), 4));
-        this.geometry.setAttribute('velocity', new three_3.InstancedBufferAttribute(new Float32Array(this.velocity), 3));
-        this.geometry.setAttribute('size', new three_3.InstancedBufferAttribute(new Float32Array(this.size), 1));
-        this.geometry.setAttribute('colorCoef', new three_3.InstancedBufferAttribute(new Float32Array(this.colorCoef), 1));
-        this.geometry.setAttribute('shape', new three_3.InstancedBufferAttribute(new Float32Array(this.shape), 1));
-        this.geometry.setAttribute('bloodOpacity', new three_3.InstancedBufferAttribute(new Float32Array(this.bloodOpacity), 1));
+        this.geometry.setAttribute('position', new three_4.Float32BufferAttribute(this.positions, 3));
+        this.geometry.setAttribute('uv', new three_4.Float32BufferAttribute(uv, 2));
+        this.geometry.setAttribute('transformRow1', new three_4.InstancedBufferAttribute(new Float32Array(transformRow1), 4));
+        this.geometry.setAttribute('transformRow2', new three_4.InstancedBufferAttribute(new Float32Array(transformRow2), 4));
+        this.geometry.setAttribute('transformRow3', new three_4.InstancedBufferAttribute(new Float32Array(transformRow3), 4));
+        this.geometry.setAttribute('transformRow4', new three_4.InstancedBufferAttribute(new Float32Array(transformRow4), 4));
+        this.geometry.setAttribute('velocity', new three_4.InstancedBufferAttribute(new Float32Array(this.velocity), 3));
+        this.geometry.setAttribute('size', new three_4.InstancedBufferAttribute(new Float32Array(this.size), 1));
+        this.geometry.setAttribute('colorCoef', new three_4.InstancedBufferAttribute(new Float32Array(this.colorCoef), 1));
+        this.geometry.setAttribute('shape', new three_4.InstancedBufferAttribute(new Float32Array(this.shape), 1));
+        this.geometry.setAttribute('bloodOpacity', new three_4.InstancedBufferAttribute(new Float32Array(this.bloodOpacity), 1));
         this.wrapper.add(this.mesh);
     }
     ;
@@ -162,7 +163,9 @@ class BloodSplatter {
             let velocityX = this.geometry.attributes.velocity.getX(i) * 0.1;
             let velocityY = this.geometry.attributes.velocity.getY(i) * 0.1;
             let velocityZ = this.geometry.attributes.velocity.getZ(i) * 0.1;
+            let size = this.geometry.attributes.size.getX(i) + 0.01;
             if (+newPositionY.toFixed(1) === 0) {
+                newPositionY = 0;
                 let bloodOpacity = this.geometry.attributes.bloodOpacity.getX(i);
                 bloodOpacity = 0;
                 this.geometry.attributes.bloodOpacity.setX(i, bloodOpacity);
@@ -179,10 +182,12 @@ class BloodSplatter {
             this.geometry.attributes.transformRow4.setX(i, newPositionX);
             this.geometry.attributes.transformRow4.setY(i, newPositionY);
             this.geometry.attributes.transformRow4.setZ(i, newPositionZ);
+            this.geometry.attributes.size.setX(i, size);
             this.geometry.attributes.transformRow1.needsUpdate = true;
             this.geometry.attributes.transformRow2.needsUpdate = true;
             this.geometry.attributes.transformRow3.needsUpdate = true;
             this.geometry.attributes.transformRow4.needsUpdate = true;
+            this.geometry.attributes.size.needsUpdate = true;
         }
     }
     ;
@@ -202,12 +207,12 @@ exports.BloodSplatter = BloodSplatter;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GroundBloodSplatter = void 0;
-const three_4 = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+const three_2 = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
 const GroundBloodSplatter_Shader_1 = __webpack_require__(/*! ./shaders/GroundBloodSplatter.Shader */ "./src/scripts/shaders/GroundBloodSplatter.Shader.ts");
 //
 class GroundBloodSplatter {
     constructor(splashPositionX, splashPositionZ) {
-        this.wrapper = new three_4.Object3D();
+        this.wrapper = new three_2.Object3D();
         this.numberOfBloodDrops = 9;
         this.positions = [];
         this.size = [];
@@ -222,9 +227,9 @@ class GroundBloodSplatter {
             this.geometry.dispose();
             this.wrapper.remove(this.mesh);
         }
-        this.geometry = new three_4.InstancedBufferGeometry();
+        this.geometry = new three_2.InstancedBufferGeometry();
         this.material = new GroundBloodSplatter_Shader_1.GroundBloodSplatterMaterial();
-        this.mesh = new three_4.Mesh(this.geometry, this.material);
+        this.mesh = new three_2.Mesh(this.geometry, this.material);
         const transformRow1 = [];
         const transformRow2 = [];
         const transformRow3 = [];
@@ -236,7 +241,7 @@ class GroundBloodSplatter {
             let positionX = 1;
             let positionY = 0.01;
             let positionZ = 1;
-            let transformMatrix = new three_4.Matrix4().compose(new three_4.Vector3(positionX, positionY, positionZ), new three_4.Quaternion().setFromEuler(new three_4.Euler(rotationX, rotationY, rotationZ)), new three_4.Vector3(0.4, 0.4, 0.4)).toArray();
+            let transformMatrix = new three_2.Matrix4().compose(new three_2.Vector3(positionX, positionY, positionZ), new three_2.Quaternion().setFromEuler(new three_2.Euler(rotationX, rotationY, rotationZ)), new three_2.Vector3(0.4, 0.4, 0.4)).toArray();
             transformRow1.push(transformMatrix[0], transformMatrix[1], transformMatrix[2], transformMatrix[3]);
             transformRow2.push(transformMatrix[4], transformMatrix[5], transformMatrix[6], transformMatrix[7]);
             transformRow3.push(transformMatrix[8], transformMatrix[9], transformMatrix[10], transformMatrix[11]);
@@ -261,15 +266,15 @@ class GroundBloodSplatter {
             0, 1,
             0, 0
         ];
-        this.geometry.setAttribute('position', new three_4.Float32BufferAttribute(this.positions, 3));
-        this.geometry.setAttribute('uv', new three_4.Float32BufferAttribute(uv, 2));
-        this.geometry.setAttribute('transformRow1', new three_4.InstancedBufferAttribute(new Float32Array(transformRow1), 4));
-        this.geometry.setAttribute('transformRow2', new three_4.InstancedBufferAttribute(new Float32Array(transformRow2), 4));
-        this.geometry.setAttribute('transformRow3', new three_4.InstancedBufferAttribute(new Float32Array(transformRow3), 4));
-        this.geometry.setAttribute('transformRow4', new three_4.InstancedBufferAttribute(new Float32Array(transformRow4), 4));
-        this.geometry.setAttribute('size', new three_4.InstancedBufferAttribute(new Float32Array(this.size), 1));
-        this.geometry.setAttribute('colorCoef', new three_4.InstancedBufferAttribute(new Float32Array(this.colorCoef), 1));
-        this.geometry.setAttribute('shape', new three_4.InstancedBufferAttribute(new Float32Array(this.shape), 1));
+        this.geometry.setAttribute('position', new three_2.Float32BufferAttribute(this.positions, 3));
+        this.geometry.setAttribute('uv', new three_2.Float32BufferAttribute(uv, 2));
+        this.geometry.setAttribute('transformRow1', new three_2.InstancedBufferAttribute(new Float32Array(transformRow1), 4));
+        this.geometry.setAttribute('transformRow2', new three_2.InstancedBufferAttribute(new Float32Array(transformRow2), 4));
+        this.geometry.setAttribute('transformRow3', new three_2.InstancedBufferAttribute(new Float32Array(transformRow3), 4));
+        this.geometry.setAttribute('transformRow4', new three_2.InstancedBufferAttribute(new Float32Array(transformRow4), 4));
+        this.geometry.setAttribute('size', new three_2.InstancedBufferAttribute(new Float32Array(this.size), 1));
+        this.geometry.setAttribute('colorCoef', new three_2.InstancedBufferAttribute(new Float32Array(this.colorCoef), 1));
+        this.geometry.setAttribute('shape', new three_2.InstancedBufferAttribute(new Float32Array(this.shape), 1));
         this.wrapper.add(this.mesh);
     }
     ;
@@ -376,7 +381,7 @@ class Main {
         let cubeMaterial = new three_1.MeshBasicMaterial({ color: '#6c6d73' });
         let cube = new three_1.Mesh(cubeGeom, cubeMaterial);
         cube.position.y += 0.07;
-        this.scene.add(cube);
+        // this.scene.add( cube );
         // Resize
         window.addEventListener('resize', this.resize());
         this.clock = new three_1.Clock();
@@ -407,6 +412,7 @@ class Main {
         pane.element.parentElement.style['width'] = '330px';
         let color = pane.addFolder({ title: "Blood color" });
         let bloodSpeed = pane.addFolder({ title: "Speed" });
+        let bloodSize = pane.addFolder({ title: "Size" });
         color.addInput(props, 'bloodGroundColor', { label: 'Ground blood color' }).on('change', () => {
             this.bloodGfx.groundBloodSplatter.material.uniforms.uColorLight.value.setHex(parseInt(props.bloodGroundColor.replace('#', '0x')));
         });
@@ -416,6 +422,13 @@ class Main {
         //
         bloodSpeed.addInput(this, 'timeCoef', { min: 0.01, max: 2, label: 'Falling blood speed' });
         bloodSpeed.addInput(this, 'fadingCoef', { min: 0.01, max: 2, label: 'Ground fading speed' });
+        bloodSize.addInput(this.bloodGfx.bloodSplatter, 'paneSize', { min: 0.01, max: 2, label: 'Size falling blood' }).on('change', (options) => {
+            for (let i = 0; i < this.bloodGfx.bloodSplatter.numberOfBloodDrops; i++) {
+                let size = this.bloodGfx.bloodSplatter.geometry.attributes.size.getX(i) * options.value;
+                this.bloodGfx.bloodSplatter.geometry.attributes.size.setX(i, size);
+                this.bloodGfx.bloodSplatter.geometry.attributes.size.needsUpdate = true;
+            }
+        });
     }
     ;
     resize() {
@@ -442,11 +455,11 @@ exports["default"] = new Main();
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BloodSplatterMaterial = void 0;
-const three_5 = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+const three_6 = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
 //
-let loader = new three_5.TextureLoader();
+let loader = new three_6.TextureLoader();
 let noise = loader.load('resources/textures/noise.png');
-class BloodSplatterMaterial extends three_5.ShaderMaterial {
+class BloodSplatterMaterial extends three_6.ShaderMaterial {
     constructor() {
         super();
         this.transparent = true,
@@ -512,7 +525,7 @@ class BloodSplatterMaterial extends three_5.ShaderMaterial {
 
             float noise = texture2D( uNoise, vUv ).r * 0.6;
 
-            if ( distanceToCenter > noise * vShape ) { discard; };
+            if ( distanceToCenter > noise * vShape + uTime * 0.0003 * noise ) { discard; };
 
             //
 
@@ -521,14 +534,15 @@ class BloodSplatterMaterial extends three_5.ShaderMaterial {
 
             gl_FragColor.rgb = mixColor;
             gl_FragColor.a = ( 1.0 - uFading ) * vBloodOpacity; // * 0.001;
+            if ( gl_FragColor.a < 0.0001 ) { discard; }
 
         }`,
             this.transparent = true,
             this.uniforms = {
                 uNoise: { value: noise },
                 uTime: { value: 0.0 },
-                uColorLight: { value: new three_5.Color(0xe32205) },
-                uColorDark: { value: new three_5.Color(0xe330802) },
+                uColorLight: { value: new three_6.Color(0xe32205) },
+                uColorDark: { value: new three_6.Color(0xe330802) },
                 uBloodTime: { value: 0.1 },
                 uFading: { value: 0.0 }
             };

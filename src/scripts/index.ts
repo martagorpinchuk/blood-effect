@@ -83,7 +83,7 @@ class Main {
         let cubeMaterial = new MeshBasicMaterial( { color: '#6c6d73' } );
         let cube = new Mesh( cubeGeom, cubeMaterial );
         cube.position.y += 0.07;
-        this.scene.add( cube );
+        // this.scene.add( cube );
 
         // Resize
         window.addEventListener( 'resize', this.resize() );
@@ -126,11 +126,12 @@ class Main {
 
         };
 
-        let pane = new Pane(  { title: "Explosion" } ); //  expanded: false
+        let pane: any = new Pane(  { title: "Explosion" } ); //  expanded: false
         pane.element.parentElement.style['width'] = '330px';
 
         let color = pane.addFolder( { title: "Blood color" } );
         let bloodSpeed = pane.addFolder( { title: "Speed" } );
+        let bloodSize = pane.addFolder( { title: "Size" } );
 
         color.addInput( props, 'bloodGroundColor', { label: 'Ground blood color' } ).on( 'change', () => {
 
@@ -148,6 +149,18 @@ class Main {
 
         bloodSpeed.addInput( this, 'timeCoef', { min: 0.01, max: 2, label: 'Falling blood speed' } );
         bloodSpeed.addInput( this, 'fadingCoef', { min: 0.01, max: 2, label: 'Ground fading speed' } );
+        bloodSize.addInput( this.bloodGfx.bloodSplatter, 'paneSize', { min: 0.01, max: 2, label: 'Size falling blood' } ).on( 'change', ( options ) => {
+
+            for( let i = 0; i < this.bloodGfx.bloodSplatter.numberOfBloodDrops; i ++ ) {
+
+                let size = this.bloodGfx.bloodSplatter.geometry.attributes.size.getX( i ) * options.value;
+
+                this.bloodGfx.bloodSplatter.geometry.attributes.size.setX( i, size );
+                this.bloodGfx.bloodSplatter.geometry.attributes.size.needsUpdate = true;
+
+            }
+
+        } );
 
     };
 
