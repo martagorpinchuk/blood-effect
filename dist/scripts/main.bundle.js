@@ -105,12 +105,12 @@ class BloodSplatter {
         const transformRow3 = [];
         const transformRow4 = [];
         for (let i = 0; i < this.numberOfBloodDrops; i++) {
-            this.rotationX = 0; //Math.PI / 3;
-            this.rotationY = Math.PI / 3; //Math.PI / 9;
-            this.rotationZ = 0; //Math.PI / 2;
-            let positionX = 0; //( Math.random() - 0.5 ) * 3;
+            this.rotationX = 0;
+            this.rotationY = Math.PI / 3;
+            this.rotationZ = 0;
+            let positionX = 0;
             let positionY = 1;
-            let positionZ = 0; //( Math.random() - 0.5 ) * 3;
+            let positionZ = 0;
             let transformMatrix = new three_4.Matrix4().compose(new three_4.Vector3(positionX, positionY, positionZ), new three_4.Quaternion().setFromEuler(new three_4.Euler(this.rotationX, this.rotationY, this.rotationZ)), new three_4.Vector3(0.5, 0.5, 0.5)).toArray();
             transformRow1.push(transformMatrix[0], transformMatrix[1], transformMatrix[2], transformMatrix[3]);
             transformRow2.push(transformMatrix[4], transformMatrix[5], transformMatrix[6], transformMatrix[7]);
@@ -530,7 +530,6 @@ class BloodSplatterMaterial extends three_6.ShaderMaterial {
             //
 
             vec3 mixColor = mix( uColorLight, uColorDark, vec3( noise ) * vColorCoef * 1.0 );
-            // mixColor = step( vec3(0.3), vec3(1.5) );
 
             gl_FragColor.rgb = mixColor;
             gl_FragColor.a = ( 1.0 - uFading ) * vBloodOpacity; // * 0.001;
@@ -601,8 +600,6 @@ class GroundBloodSplatterMaterial extends three_5.ShaderMaterial {
             // pos.x += sin( uBloodTime ) * 0.6;
 
             gl_Position = projectionMatrix * modelViewMatrix * transforms * vec4( pos * size, 1.0 );
-
-            // gl_Position = projectionMatrix * ( modelViewMatrix * transforms * vec4( 0.0, 0.0, 0.0, 1.0 ) + vec4( pos * size, 1.0 ) );
 
             vUv = uv;
             vColorCoef = colorCoef;

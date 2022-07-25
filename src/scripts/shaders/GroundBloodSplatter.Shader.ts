@@ -43,8 +43,6 @@ export class GroundBloodSplatterMaterial extends ShaderMaterial {
 
             gl_Position = projectionMatrix * modelViewMatrix * transforms * vec4( pos * size, 1.0 );
 
-            // gl_Position = projectionMatrix * ( modelViewMatrix * transforms * vec4( 0.0, 0.0, 0.0, 1.0 ) + vec4( pos * size, 1.0 ) );
-
             vUv = uv;
             vColorCoef = colorCoef;
             vShape = shape;

@@ -64,13 +64,13 @@ export class BloodSplatter {
 
         for ( let i = 0; i < this.numberOfBloodDrops; i ++ ) {
 
-            this.rotationX = 0;//Math.PI / 3;
-            this.rotationY = Math.PI / 3; //Math.PI / 9;
-            this.rotationZ = 0; //Math.PI / 2;
+            this.rotationX = 0;
+            this.rotationY = Math.PI / 3;
+            this.rotationZ = 0;
 
-            let positionX = 0;//( Math.random() - 0.5 ) * 3;
+            let positionX = 0;
             let positionY = 1;
-            let positionZ = 0;//( Math.random() - 0.5 ) * 3;
+            let positionZ = 0;
 
             let transformMatrix = new Matrix4().compose( new Vector3( positionX, positionY, positionZ ), new Quaternion().setFromEuler( new Euler( this.rotationX, this.rotationY, this.rotationZ ) ), new Vector3( 0.5, 0.5, 0.5 ) ).toArray();
 
