@@ -26,6 +26,7 @@ export class BloodSplatter {
     public splashPositionX: Array<number> = [];
     public splashPositionZ: Array<number> = [];
     public paneSize: number = 0.1;
+    public newSize: Array<number> = [];
 
     constructor () {
 
@@ -68,9 +69,9 @@ export class BloodSplatter {
             this.rotationY = Math.PI / 3;
             this.rotationZ = 0;
 
-            let positionX = 0;
+            let positionX = Math.random();
             let positionY = 1;
-            let positionZ = 0;
+            let positionZ = Math.random();
 
             let transformMatrix = new Matrix4().compose( new Vector3( positionX, positionY, positionZ ), new Quaternion().setFromEuler( new Euler( this.rotationX, this.rotationY, this.rotationZ ) ), new Vector3( 0.5, 0.5, 0.5 ) ).toArray();
 
@@ -80,7 +81,7 @@ export class BloodSplatter {
             transformRow4.push( transformMatrix[12], transformMatrix[13], transformMatrix[14], transformMatrix[15] );
 
             this.velocity.push( Math.random() * 9, ( Math.random() + 0.5 ) * 8, Math.random() * 9 );
-            this.size.push( Math.random() * 0.5 );
+            this.size.push( Math.random() * 0.04 );
             this.colorCoef.push( ( Math.random() + 0.5 ) * 1.4 );
             this.shape.push(  Math.random() );
             this.bloodOpacity.push( 1 );
@@ -145,34 +146,40 @@ export class BloodSplatter {
             let velocityY = this.geometry.attributes.velocity.getY( i ) * 0.1;
             let velocityZ = this.geometry.attributes.velocity.getZ( i ) * 0.1;
 
-            let size = this.geometry.attributes.size.getX( i ) + 0.01;
+            let size = this.geometry.attributes.size.getX( i );// + 0.01;
 
-            if ( + newPositionY.toFixed( 1 ) === 0 ) {
+            if ( newPositionY > 0.0 ) {
+
+                newPositionX += - velocityX * this.elapsedTimeFall * 0.00004 * timeCoef;
+                newPositionY += - velocityY * this.elapsedTimeFall * 0.00004 * timeCoef;
+                newPositionZ += - velocityZ * this.elapsedTimeFall * 0.00004 * timeCoef;
+
+                size += 0.01;
+
+            } else {
 
                 newPositionY = 0;
 
-                let bloodOpacity = this.geometry.attributes.bloodOpacity.getX( i );
+                this.newSize[ i ] = size;
 
-                bloodOpacity = 0;
+            }
 
-                this.geometry.attributes.bloodOpacity.setX( i , bloodOpacity );
+            if ( + newPositionY.toFixed( 1 ) == 0 ) {
+
+                // newPositionY = 0;
+
+                this.geometry.attributes.bloodOpacity.setX( i , 0 );
 
                 this.geometry.attributes.bloodOpacity.needsUpdate = true;
 
                 this.bloodDisappear = true;
 
-                if (  this.bloodDisappear ) {
+                this.splashPositionX[ i ] = newPositionX;
+                this.splashPositionZ[ i ] = newPositionZ;
 
-                    this.splashPositionX.push( newPositionX );
-                    this.splashPositionZ.push( newPositionZ );
-
-                }
+                // this.newSize[ i ] = size;
 
             }
-
-            newPositionX += - velocityX * this.elapsedTimeFall * 0.0001 * timeCoef;
-            newPositionY += - velocityY * this.elapsedTimeFall * 0.0001 * timeCoef;
-            newPositionZ += - velocityZ * this.elapsedTimeFall * 0.0001 * timeCoef;
 
             this.geometry.attributes.transformRow4.setX( i, newPositionX );
             this.geometry.attributes.transformRow4.setY( i, newPositionY );

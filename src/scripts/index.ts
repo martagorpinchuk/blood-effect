@@ -69,6 +69,7 @@ class Main {
         let planeGeometry = new PlaneBufferGeometry( 6.5, 6.5, 1, 1 );
         let planeMaterial = new MeshBasicMaterial( { color: '#818891' } );
         this.plane = new Mesh( planeGeometry, planeMaterial );
+        this.plane.position.y = 0;
         this.plane.rotation.x -= Math.PI / 2;
         this.plane.rotation.z -= Math.PI / 4;
         this.scene.add( this.plane );
@@ -149,7 +150,7 @@ class Main {
 
         bloodSpeed.addInput( this, 'timeCoef', { min: 0.01, max: 2, label: 'Falling blood speed' } );
         bloodSpeed.addInput( this, 'fadingCoef', { min: 0.01, max: 2, label: 'Ground fading speed' } );
-        bloodSize.addInput( this.bloodGfx.bloodSplatter, 'paneSize', { min: 0.01, max: 2, label: 'Size falling blood' } ).on( 'change', ( options ) => {
+        bloodSize.addInput( this.bloodGfx.bloodSplatter, 'paneSize', { min: 0.0, max: 2, label: 'Size falling blood' } ).on( 'change', ( options ) => {
 
             for( let i = 0; i < this.bloodGfx.bloodSplatter.numberOfBloodDrops; i ++ ) {
 
@@ -157,6 +158,8 @@ class Main {
 
                 this.bloodGfx.bloodSplatter.geometry.attributes.size.setX( i, size );
                 this.bloodGfx.bloodSplatter.geometry.attributes.size.needsUpdate = true;
+
+                console.log( options.value );
 
             }
 
@@ -195,7 +198,7 @@ class Main {
         this.controls.update();
         this.renderer.render( this.scene, this.camera );
 
-        if ( Math.round( this.elapsedTime ) > 4500 ) {
+        if ( Math.round( this.elapsedTime ) > 3500 ) {
 
             this.createBlood();
 

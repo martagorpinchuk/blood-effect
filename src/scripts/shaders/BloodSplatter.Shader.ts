@@ -39,13 +39,7 @@ export class BloodSplatterMaterial extends ShaderMaterial {
                 transformRow4
             );
 
-            vec3 pos = position;
-            // pos.y += cos( uBloodTime ) * 0.6;
-            // pos.x += sin( uBloodTime ) * 0.6;
-
-            // gl_Position = projectionMatrix * modelViewMatrix * transforms * vec4( position * size, 1.0 );
-
-            gl_Position = projectionMatrix * ( modelViewMatrix * transforms * vec4( 0.0, 0.0, position.z, 1.0 ) + vec4( position * size, 1.0 ) );
+            gl_Position = projectionMatrix * ( modelViewMatrix * transforms * vec4( 0.0, 0.0, position.z, 1.0 ) + vec4( position * size * 2.0, 1.0 ) ); //2.3
 
             // gl_Position = projectionMatrix * ( modelViewMatrix * transforms * vec4( 0.0, 0.0, 0.0, 1.0 ) + vec4( pos, 1.0 ) );
 
@@ -69,12 +63,13 @@ export class BloodSplatterMaterial extends ShaderMaterial {
 
         void main () {
 
+            // vec2 centeredUv = vec2( vec2( vUv.x * ( uTime * 0.0005 ) * 1.9 - 0.1, ( vUv.y * ( uTime * 0.0009 ) * 0.9 - 0.2 ) ) );
             vec2 centeredUv = vec2( vec2( vUv.x - 0.5, ( vUv.y - 0.5 ) * 2.2 ) );
-            float distanceToCenter = length( centeredUv );
+            float distanceToCenter = length( centeredUv ) * 8.0;
 
             float noise = texture2D( uNoise, vUv ).r * 0.6;
 
-            if ( distanceToCenter > noise * vShape + uTime * 0.0003 * noise ) { discard; };
+            if ( distanceToCenter * uTime * 0.0002 + 0.1 > noise * vShape + uTime * 0.0001 * noise ) { discard; };
 
             //
 

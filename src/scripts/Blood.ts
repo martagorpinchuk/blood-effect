@@ -35,7 +35,7 @@ export class BloodGfx {
 
     public addGroundBloodSplatter () : void {
 
-        this.groundBloodSplatter = new GroundBloodSplatter( this.bloodSplatter.splashPositionX, this.bloodSplatter.splashPositionZ );
+        this.groundBloodSplatter = new GroundBloodSplatter( this.bloodSplatter.splashPositionX, this.bloodSplatter.splashPositionZ, this.bloodSplatter.newSize );
 
     };
 
@@ -43,16 +43,26 @@ export class BloodGfx {
 
         this.bloodSplatter.update( elapsedTime, timeCoef );
 
-        if( this.bloodSplatter.bloodDisappear ) {
+        if ( this.bloodSplatter.bloodDisappear ) {
 
             this.delta = this.clock.getDelta() * 1000;
             this.elapsedTimeBlood += this.delta;
 
-            this.groundBloodSplatter.update( elapsedTime, this.bloodSplatter.splashPositionX, this.bloodSplatter.splashPositionZ );
+            this.groundBloodSplatter.update( elapsedTime, this.bloodSplatter.splashPositionX, this.bloodSplatter.splashPositionZ, this.bloodSplatter.newSize );
             this.groundBloodSplatter.material.uniforms.uVisibility.value = 1.0;
             this.groundBloodSplatter.material.uniforms.uFading.value = this.elapsedTimeBlood * 0.001 * fadingCoef;
 
+            for ( let i = 0; i < this.groundBloodSplatter.numberOfBloodDrops; i ++ ) {
+
+                let size = this.bloodSplatter.geometry.attributes.size.getX( i );
+
+                this.groundBloodSplatter.geometry.attributes.size.setX( i, size );
+
+            };
+
         };
+
+        // this.groundBloodSplatter.geometry.attributes.size.needsUpdate = true;
 
         this.groundBloodSplatter.geometry.attributes.transformRow1.needsUpdate = true;
         this.groundBloodSplatter.geometry.attributes.transformRow2.needsUpdate = true;

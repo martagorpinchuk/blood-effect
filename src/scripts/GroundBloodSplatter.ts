@@ -10,20 +10,20 @@ export class GroundBloodSplatter {
     public geometry: InstancedBufferGeometry;
     public wrapper: Object3D = new Object3D();
     public mesh: Mesh;
-    public numberOfBloodDrops: number = 9;
+    public numberOfBloodDrops: number = 5;
     public positions: Array<number> = [];
     public size: Array<number> = [];
     public colorCoef: Array<number> = [];
     public shape: Array<number> = [];
     public noiseFade: Array<number> = [];
 
-    constructor ( splashPositionX: Array<number>, splashPositionZ: Array<number> ) {
+    constructor ( splashPositionX: Array<number>, splashPositionZ: Array<number>, size: Array<number> ) {
 
-        this.generate( splashPositionX, splashPositionZ );
+        this.generate( splashPositionX, splashPositionZ, size );
 
     };
 
-    public generate ( splashPositionX, splashPositionZ ) : void {
+    public generate ( splashPositionX, splashPositionZ, size ) : void {
 
         if ( this.mesh ) {
 
@@ -42,6 +42,9 @@ export class GroundBloodSplatter {
         const transformRow3: number[] = [];
         const transformRow4: number[] = [];
 
+        this.size = size;
+        // console.log( this.size );
+
         for ( let i = 0; i < this.numberOfBloodDrops; i ++ ) {
 
             let rotationX = - Math.PI / 2;
@@ -59,7 +62,9 @@ export class GroundBloodSplatter {
             transformRow3.push( transformMatrix[8], transformMatrix[9], transformMatrix[10], transformMatrix[11] );
             transformRow4.push( transformMatrix[12], transformMatrix[13], transformMatrix[14], transformMatrix[15] );
 
-            this.size.push( Math.random() * 2 );
+            // this.size[ i ] = size[ i ];
+            // console.log(size)
+            this.size.push( 1 );
             this.colorCoef.push( ( Math.random() + 0.5 ) * 1.4 );
             this.shape.push( Math.random() );
 
@@ -104,23 +109,29 @@ export class GroundBloodSplatter {
 
     };
 
-    public update ( elapsedTime, splashPositionX, splashPositionZ ) {
+    public update ( elapsedTime, splashPositionX, splashPositionZ, size ) {
+
+        this.material.uniforms.uTime = elapsedTime;
 
         for ( let i = 0; i < this.numberOfBloodDrops; i ++ ) {
 
-            let newPositionX = this.geometry.attributes.transformRow4.getX( i );
-            let newPositionZ = this.geometry.attributes.transformRow4.getZ( i );
+            let newPositionX;
+            let newPositionZ;
+            let newSize;
 
             newPositionX = splashPositionX[ i ];
             newPositionZ = splashPositionZ[ i ];
+            newSize = size[ i ];
 
             this.geometry.attributes.transformRow4.setX( i, newPositionX );
             this.geometry.attributes.transformRow4.setZ( i, newPositionZ );
+            this.geometry.attributes.size.setX( i, newSize );
 
             this.geometry.attributes.transformRow1.needsUpdate = true;
             this.geometry.attributes.transformRow2.needsUpdate = true;
             this.geometry.attributes.transformRow3.needsUpdate = true;
             this.geometry.attributes.transformRow4.needsUpdate = true;
+            this.geometry.attributes.size.needsUpdate = true;
 
         }
 

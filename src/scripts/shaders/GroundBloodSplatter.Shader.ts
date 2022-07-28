@@ -38,8 +38,6 @@ export class GroundBloodSplatterMaterial extends ShaderMaterial {
             );
 
             vec3 pos = position;
-            // pos.y += cos( uBloodTime ) * 0.6;
-            // pos.x += sin( uBloodTime ) * 0.6;
 
             gl_Position = projectionMatrix * modelViewMatrix * transforms * vec4( pos * size, 1.0 );
 
@@ -72,7 +70,6 @@ export class GroundBloodSplatterMaterial extends ShaderMaterial {
             //
 
             vec3 mixColor = mix( uColorLight, uColorDark, vec3( noise ) * vColorCoef * 1.0 );
-            // mixColor = step( vec3(0.3), vec3(1.5) );
 
             gl_FragColor.rgb = mixColor;
             gl_FragColor.a = ( 1.0 - uFading * noise * 2.3 ) * uVisibility; // * 0.001;
