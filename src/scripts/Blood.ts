@@ -35,7 +35,7 @@ export class BloodGfx {
 
     public addGroundBloodSplatter () : void {
 
-        this.groundBloodSplatter = new GroundBloodSplatter( this.bloodSplatter.splashPositionX, this.bloodSplatter.splashPositionZ, this.bloodSplatter.newSize );
+        this.groundBloodSplatter = new GroundBloodSplatter( this.bloodSplatter.splashPositionX, this.bloodSplatter.splashPositionZ );
 
     };
 
@@ -52,13 +52,13 @@ export class BloodGfx {
             this.groundBloodSplatter.material.uniforms.uVisibility.value = 1.0;
             this.groundBloodSplatter.material.uniforms.uFading.value = this.elapsedTimeBlood * 0.001 * fadingCoef;
 
-            for ( let i = 0; i < this.groundBloodSplatter.numberOfBloodDrops; i ++ ) {
+            // for ( let i = 0; i < this.groundBloodSplatter.numberOfBloodDrops; i ++ ) {
 
-                let size = this.bloodSplatter.geometry.attributes.size.getX( i );
+            //     let size = this.bloodSplatter.geometry.attributes.size.getX( i ) + elapsedTime * 0.0002 + 0.1;
 
-                this.groundBloodSplatter.geometry.attributes.size.setX( i, size );
+            //     this.groundBloodSplatter.geometry.attributes.size.setX( i, size );
 
-            };
+            // };
 
         };
 

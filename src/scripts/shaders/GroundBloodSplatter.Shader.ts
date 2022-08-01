@@ -39,7 +39,7 @@ export class GroundBloodSplatterMaterial extends ShaderMaterial {
 
             vec3 pos = position;
 
-            gl_Position = projectionMatrix * modelViewMatrix * transforms * vec4( pos * size, 1.0 );
+            gl_Position = projectionMatrix * modelViewMatrix * transforms * vec4( pos * size * 1.0, 1.0 );
 
             vUv = uv;
             vColorCoef = colorCoef;
@@ -60,12 +60,14 @@ export class GroundBloodSplatterMaterial extends ShaderMaterial {
 
         void main () {
 
-            vec2 centeredUv = vec2( vec2( vUv.x - 0.5, ( vUv.y - 0.5 ) * 1.2 ) );
-            float distanceToCenter = length( centeredUv );
+            vec2 centeredUv = vec2( vec2( vUv.x - 0.5, ( vUv.y - 0.5 ) * 1.0 ) );
+            // vec2 centeredUv = vec2( vec2( vUv.x - 0.5, ( vUv.y - 0.5 ) * 2.2 ) );
+            float distanceToCenter = length( centeredUv ) * 2.0;
 
             float noise = texture2D( uNoise, vUv ).r * 0.6;
 
-            if ( distanceToCenter > noise * vShape ) { discard; };
+            if ( distanceToCenter > noise * 1.0 ) { discard; };
+            // if ( distanceToCenter * uTime * 0.000002 > noise * vShape + uTime * 0.000001 * noise ) { discard; };
 
             //
 

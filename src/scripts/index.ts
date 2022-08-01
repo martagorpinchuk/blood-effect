@@ -159,8 +159,6 @@ class Main {
                 this.bloodGfx.bloodSplatter.geometry.attributes.size.setX( i, size );
                 this.bloodGfx.bloodSplatter.geometry.attributes.size.needsUpdate = true;
 
-                console.log( options.value );
-
             }
 
         } );

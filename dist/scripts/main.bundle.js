@@ -31,7 +31,7 @@ class BloodGfx {
     }
     ;
     addGroundBloodSplatter() {
-        this.groundBloodSplatter = new GroundBloodSplatter_1.GroundBloodSplatter(this.bloodSplatter.splashPositionX, this.bloodSplatter.splashPositionZ, this.bloodSplatter.newSize);
+        this.groundBloodSplatter = new GroundBloodSplatter_1.GroundBloodSplatter(this.bloodSplatter.splashPositionX, this.bloodSplatter.splashPositionZ);
     }
     ;
     update(elapsedTime, fadingCoef, timeCoef) {
@@ -42,11 +42,10 @@ class BloodGfx {
             this.groundBloodSplatter.update(elapsedTime, this.bloodSplatter.splashPositionX, this.bloodSplatter.splashPositionZ, this.bloodSplatter.newSize);
             this.groundBloodSplatter.material.uniforms.uVisibility.value = 1.0;
             this.groundBloodSplatter.material.uniforms.uFading.value = this.elapsedTimeBlood * 0.001 * fadingCoef;
-            for (let i = 0; i < this.groundBloodSplatter.numberOfBloodDrops; i++) {
-                let size = this.bloodSplatter.geometry.attributes.size.getX(i);
-                this.groundBloodSplatter.geometry.attributes.size.setX(i, size);
-            }
-            ;
+            // for ( let i = 0; i < this.groundBloodSplatter.numberOfBloodDrops; i ++ ) {
+            //     let size = this.bloodSplatter.geometry.attributes.size.getX( i ) + elapsedTime * 0.0002 + 0.1;
+            //     this.groundBloodSplatter.geometry.attributes.size.setX( i, size );
+            // };
         }
         ;
         // this.groundBloodSplatter.geometry.attributes.size.needsUpdate = true;
@@ -124,9 +123,9 @@ class BloodSplatter {
             transformRow3.push(transformMatrix[8], transformMatrix[9], transformMatrix[10], transformMatrix[11]);
             transformRow4.push(transformMatrix[12], transformMatrix[13], transformMatrix[14], transformMatrix[15]);
             this.velocity.push(Math.random() * 9, (Math.random() + 0.5) * 8, Math.random() * 9);
-            this.size.push(Math.random() * 0.04);
+            this.size.push(Math.random() * 0.1);
             this.colorCoef.push((Math.random() + 0.5) * 1.4);
-            this.shape.push(Math.random());
+            this.shape.push(Math.random() * 0.5);
             this.bloodOpacity.push(1);
         }
         this.positions = [
@@ -222,7 +221,7 @@ const three_3 = __webpack_require__(/*! three */ "./node_modules/three/build/thr
 const GroundBloodSplatter_Shader_1 = __webpack_require__(/*! ./shaders/GroundBloodSplatter.Shader */ "./src/scripts/shaders/GroundBloodSplatter.Shader.ts");
 //
 class GroundBloodSplatter {
-    constructor(splashPositionX, splashPositionZ, size) {
+    constructor(splashPositionX, splashPositionZ) {
         this.wrapper = new three_3.Object3D();
         this.numberOfBloodDrops = 5;
         this.positions = [];
@@ -230,10 +229,10 @@ class GroundBloodSplatter {
         this.colorCoef = [];
         this.shape = [];
         this.noiseFade = [];
-        this.generate(splashPositionX, splashPositionZ, size);
+        this.generate(splashPositionX, splashPositionZ);
     }
     ;
-    generate(splashPositionX, splashPositionZ, size) {
+    generate(splashPositionX, splashPositionZ) {
         if (this.mesh) {
             this.geometry.dispose();
             this.wrapper.remove(this.mesh);
@@ -245,7 +244,7 @@ class GroundBloodSplatter {
         const transformRow2 = [];
         const transformRow3 = [];
         const transformRow4 = [];
-        this.size = size;
+        // this.size = size;
         // console.log( this.size );
         for (let i = 0; i < this.numberOfBloodDrops; i++) {
             let rotationX = -Math.PI / 2;
@@ -259,9 +258,7 @@ class GroundBloodSplatter {
             transformRow2.push(transformMatrix[4], transformMatrix[5], transformMatrix[6], transformMatrix[7]);
             transformRow3.push(transformMatrix[8], transformMatrix[9], transformMatrix[10], transformMatrix[11]);
             transformRow4.push(transformMatrix[12], transformMatrix[13], transformMatrix[14], transformMatrix[15]);
-            // this.size[ i ] = size[ i ];
-            // console.log(size)
-            this.size.push(1);
+            this.size.push(0);
             this.colorCoef.push((Math.random() + 0.5) * 1.4);
             this.shape.push(Math.random());
         }
@@ -301,9 +298,10 @@ class GroundBloodSplatter {
             let newSize;
             newPositionX = splashPositionX[i];
             newPositionZ = splashPositionZ[i];
-            newSize = size[i];
+            newSize = size[i] * 0.9; // / this.geometry.attributes.shape.getX( i );// * 1.9;
             this.geometry.attributes.transformRow4.setX(i, newPositionX);
             this.geometry.attributes.transformRow4.setZ(i, newPositionZ);
+            // this.geometry.attributes.size.setX( i, newSize + elapsedTime * 0.0002 );
             this.geometry.attributes.size.setX(i, newSize);
             this.geometry.attributes.transformRow1.needsUpdate = true;
             this.geometry.attributes.transformRow2.needsUpdate = true;
@@ -448,7 +446,6 @@ class Main {
                 let size = this.bloodGfx.bloodSplatter.geometry.attributes.size.getX(i) * options.value;
                 this.bloodGfx.bloodSplatter.geometry.attributes.size.setX(i, size);
                 this.bloodGfx.bloodSplatter.geometry.attributes.size.needsUpdate = true;
-                console.log(options.value);
             }
         });
     }
@@ -512,7 +509,7 @@ class BloodSplatterMaterial extends three_6.ShaderMaterial {
                 transformRow4
             );
 
-            gl_Position = projectionMatrix * ( modelViewMatrix * transforms * vec4( 0.0, 0.0, position.z, 1.0 ) + vec4( position * size * 2.0, 1.0 ) ); //2.3
+            gl_Position = projectionMatrix * ( modelViewMatrix * transforms * vec4( 0.0, 0.0, position.z, 1.0 ) + vec4( position * size * 0.7, 1.0 ) ); //2.3
 
             // gl_Position = projectionMatrix * ( modelViewMatrix * transforms * vec4( 0.0, 0.0, 0.0, 1.0 ) + vec4( pos, 1.0 ) );
 
@@ -537,12 +534,13 @@ class BloodSplatterMaterial extends three_6.ShaderMaterial {
         void main () {
 
             // vec2 centeredUv = vec2( vec2( vUv.x * ( uTime * 0.0005 ) * 1.9 - 0.1, ( vUv.y * ( uTime * 0.0009 ) * 0.9 - 0.2 ) ) );
-            vec2 centeredUv = vec2( vec2( vUv.x - 0.5, ( vUv.y - 0.5 ) * 2.2 ) );
-            float distanceToCenter = length( centeredUv ) * 8.0;
+            vec2 centeredUv = vec2( vec2( vUv.x - 0.5, ( vUv.y - 0.5 ) * 1.7 ) );
+            float distanceToCenter = length( centeredUv ) * 11.0;
 
             float noise = texture2D( uNoise, vUv ).r * 0.6;
 
-            if ( distanceToCenter * uTime * 0.0002 + 0.1 > noise * vShape + uTime * 0.0001 * noise ) { discard; };
+            // if ( distanceToCenter * uTime * 0.0002 > noise * vShape + uTime * 0.0001 * noise ) { discard; };
+            if ( distanceToCenter * uTime * 0.0002 + 0.1 > noise + uTime * 0.0001 * noise ) { discard; };
 
             //
 
@@ -614,7 +612,7 @@ class GroundBloodSplatterMaterial extends three_5.ShaderMaterial {
 
             vec3 pos = position;
 
-            gl_Position = projectionMatrix * modelViewMatrix * transforms * vec4( pos * size, 1.0 );
+            gl_Position = projectionMatrix * modelViewMatrix * transforms * vec4( pos * size * 1.0, 1.0 );
 
             vUv = uv;
             vColorCoef = colorCoef;
@@ -635,12 +633,14 @@ class GroundBloodSplatterMaterial extends three_5.ShaderMaterial {
 
         void main () {
 
-            vec2 centeredUv = vec2( vec2( vUv.x - 0.5, ( vUv.y - 0.5 ) * 1.2 ) );
-            float distanceToCenter = length( centeredUv );
+            vec2 centeredUv = vec2( vec2( vUv.x - 0.5, ( vUv.y - 0.5 ) * 1.0 ) );
+            // vec2 centeredUv = vec2( vec2( vUv.x - 0.5, ( vUv.y - 0.5 ) * 2.2 ) );
+            float distanceToCenter = length( centeredUv ) * 2.0;
 
             float noise = texture2D( uNoise, vUv ).r * 0.6;
 
-            if ( distanceToCenter > noise * vShape ) { discard; };
+            if ( distanceToCenter > noise * 1.0 ) { discard; };
+            // if ( distanceToCenter * uTime * 0.000002 > noise * vShape + uTime * 0.000001 * noise ) { discard; };
 
             //
 

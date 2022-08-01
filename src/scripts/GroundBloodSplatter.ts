@@ -17,13 +17,13 @@ export class GroundBloodSplatter {
     public shape: Array<number> = [];
     public noiseFade: Array<number> = [];
 
-    constructor ( splashPositionX: Array<number>, splashPositionZ: Array<number>, size: Array<number> ) {
+    constructor ( splashPositionX: Array<number>, splashPositionZ: Array<number> ) {
 
-        this.generate( splashPositionX, splashPositionZ, size );
+        this.generate( splashPositionX, splashPositionZ );
 
     };
 
-    public generate ( splashPositionX, splashPositionZ, size ) : void {
+    public generate ( splashPositionX, splashPositionZ ) : void {
 
         if ( this.mesh ) {
 
@@ -42,7 +42,7 @@ export class GroundBloodSplatter {
         const transformRow3: number[] = [];
         const transformRow4: number[] = [];
 
-        this.size = size;
+        // this.size = size;
         // console.log( this.size );
 
         for ( let i = 0; i < this.numberOfBloodDrops; i ++ ) {
@@ -62,9 +62,7 @@ export class GroundBloodSplatter {
             transformRow3.push( transformMatrix[8], transformMatrix[9], transformMatrix[10], transformMatrix[11] );
             transformRow4.push( transformMatrix[12], transformMatrix[13], transformMatrix[14], transformMatrix[15] );
 
-            // this.size[ i ] = size[ i ];
-            // console.log(size)
-            this.size.push( 1 );
+            this.size.push( 0 );
             this.colorCoef.push( ( Math.random() + 0.5 ) * 1.4 );
             this.shape.push( Math.random() );
 
@@ -121,10 +119,11 @@ export class GroundBloodSplatter {
 
             newPositionX = splashPositionX[ i ];
             newPositionZ = splashPositionZ[ i ];
-            newSize = size[ i ];
+            newSize = size[ i ] * 0.9;// / this.geometry.attributes.shape.getX( i );// * 1.9;
 
             this.geometry.attributes.transformRow4.setX( i, newPositionX );
             this.geometry.attributes.transformRow4.setZ( i, newPositionZ );
+            // this.geometry.attributes.size.setX( i, newSize + elapsedTime * 0.0002 );
             this.geometry.attributes.size.setX( i, newSize );
 
             this.geometry.attributes.transformRow1.needsUpdate = true;

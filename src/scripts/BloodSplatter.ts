@@ -81,9 +81,9 @@ export class BloodSplatter {
             transformRow4.push( transformMatrix[12], transformMatrix[13], transformMatrix[14], transformMatrix[15] );
 
             this.velocity.push( Math.random() * 9, ( Math.random() + 0.5 ) * 8, Math.random() * 9 );
-            this.size.push( Math.random() * 0.04 );
+            this.size.push( Math.random() * 0.1 );
             this.colorCoef.push( ( Math.random() + 0.5 ) * 1.4 );
-            this.shape.push(  Math.random() );
+            this.shape.push(  Math.random() * 0.5 );
             this.bloodOpacity.push( 1 );
 
         }
